@@ -26,7 +26,7 @@ public class Epic extends Task {
         return removedSubtask;
     }
 
-    public Subtask getSubtask(int id) {
+    public Subtask getSubtaskById(int id) {
         return subtasks.get(id);
     }
 
@@ -39,6 +39,7 @@ public class Epic extends Task {
         }
 
         long doneCount = subtasks.values().stream().filter(subtask -> subtask.status == TaskStatus.DONE).count();
+
         long newCount = subtasks.values().stream().filter(subtask -> subtask.status == TaskStatus.NEW).count();
 
         if (doneCount == subtasksCount) {
@@ -50,10 +51,14 @@ public class Epic extends Task {
         }
     }
 
-    @Override
+// метод добавлял чтобы нельзя было вручную установить статус для Epic, но вспомнил, что по условиям ТЗ все обновление
+// должно проходить через передачу обновленного объекта в manager через метод update, убрал этот метод просто
+// перед обновлением Epic добавил вызов расчета статуса (коментарий и метод оставил для пояснения своей логики Ревьюеверу)
+// для будущей работы с этой заготовкой закомментированные строки удалю.
+/*    @Override
     public void setStatus(TaskStatus status) {
         checkStatus();
-    }
+    }*/
 
     @Override
     public String toString() {

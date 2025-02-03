@@ -39,7 +39,8 @@ public class Main {
         task2.setStatus(TaskStatus.DONE);
         subtask1.setStatus(TaskStatus.DONE);
         subtask2.setStatus(TaskStatus.DONE);
-        epic3.setStatus(TaskStatus.DONE); //Проверяем что нельзя установить принудительно статус в Эпике
+        epic3.setStatus(TaskStatus.DONE);//Проверяем что нельзя установить принудительно статус в Эпике
+        manager.updateEpic(epic3);
 
         System.out.println("-".repeat(20));
         System.out.println("After status changing");

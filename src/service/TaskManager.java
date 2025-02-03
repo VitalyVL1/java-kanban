@@ -67,6 +67,10 @@ public class TaskManager {
     }
 
     public Map<Integer, Subtask> getAllSubtasksByEpic(Epic epic) {
+        if (!epics.containsKey(epic.getId())) {
+            return new HashMap<>();
+        }
+
         return epic.getSubtasks();
     }
 
@@ -82,12 +86,14 @@ public class TaskManager {
     public void clearSubtasks() {
         for(Epic epic : epics.values()) {
             epic.getSubtasks().clear();
+            epic.checkStatus();
         }
 
         subtasks.clear();
     }
 
     public void updateEpic(Epic epic) {
+        epic.checkStatus();
         epics.put(epic.getId(), epic);
     }
 
