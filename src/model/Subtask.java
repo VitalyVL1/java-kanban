@@ -6,7 +6,6 @@ public class Subtask extends Task {
     public Subtask(String title, String description, Epic epic) {
         super(title, description);
         this.epic = epic;
-        epic.addOrUpdateSubtask(this);
     }
 
     public Epic getEpic() {
@@ -14,18 +13,12 @@ public class Subtask extends Task {
     }
 
     @Override
-    public void setStatus(TaskStatus status) {
-       this.status = status;
-       epic.checkStatus();
-    }
-
-    @Override
     public String toString() {
         return "Subtask{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
+                "id=" + getId() +
+                ", title='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
                 '}';
     }
 }

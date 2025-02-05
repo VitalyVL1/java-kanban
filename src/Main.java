@@ -36,9 +36,17 @@ public class Main {
         System.out.println("manager.getAllSubtasksByEpic(epic3) = " + manager.getAllSubtasksByEpic(epic3));
 
         task1.setStatus(TaskStatus.IN_PROGRESS);
+        manager.updateTask(task1);
+
         task2.setStatus(TaskStatus.DONE);
+        manager.updateTask(task2);
+
         subtask1.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask1);
+
         subtask2.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask2);
+
         epic3.setStatus(TaskStatus.DONE);//Проверяем что нельзя установить принудительно статус в Эпике
         manager.updateEpic(epic3);
 

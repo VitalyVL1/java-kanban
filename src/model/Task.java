@@ -1,17 +1,14 @@
 package model;
 
-import static service.TaskManager.incrementAndGetTaskCounter;
-
 import java.util.Objects;
 
 public class Task {
-    protected int id;
-    protected String title;
-    protected String description;
-    protected TaskStatus status;
+    private int id;
+    private String title;
+    private String description;
+    private TaskStatus status;
 
     public Task(String title, String description) {
-        id = incrementAndGetTaskCounter();
         this.title = title;
         this.description = description;
         status = TaskStatus.NEW;
@@ -19,6 +16,10 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
