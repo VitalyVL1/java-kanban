@@ -5,7 +5,6 @@ import model.Subtask;
 import model.Task;
 
 import java.util.List;
-import java.util.Map;
 
 public interface TaskManager {
     List<Epic> getEpics();

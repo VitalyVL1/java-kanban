@@ -17,9 +17,9 @@ public class InMemoryTaskManager implements TaskManager {
     private int taskCounter = 0;
     private final HistoryManager historyManager;
 
-    private Map<Integer, Epic> epics = new HashMap<>();
-    private Map<Integer, Task> tasks = new HashMap<>();
-    private Map<Integer, Subtask> subtasks = new HashMap<>();
+    private final Map<Integer, Epic> epics = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, Subtask> subtasks = new HashMap<>();
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -76,7 +76,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic removeEpic(int id) {
         Epic epic = epics.remove(id);
-        List<Integer> subtaskIdList = epic.getSubtasks().values().stream().map(subtask -> subtask.getId()).toList();
+        List<Integer> subtaskIdList = epic.getSubtasks().values().stream().map(Task::getId).toList();
 
         for (int subtaskId : subtaskIdList) {
             subtasks.remove(subtaskId);
