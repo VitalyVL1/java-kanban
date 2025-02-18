@@ -18,6 +18,8 @@ class TaskTest {
 
     @Test
     void testTaskEquals_ShouldReturnTrue() {
+        assertEquals(task1, task2,"сравнение с id = null, должен быть true");
+
         task1.setId(1);
         task2.setId(1);
 
