@@ -2,6 +2,7 @@ package model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Epic extends Task {
     private final Map<Integer, Subtask> subtasks;
@@ -9,6 +10,19 @@ public class Epic extends Task {
     public Epic(String title, String description) {
         super(title, description);
         subtasks = new HashMap<>();
+    }
+
+    public Epic(Epic epic) {
+        super(epic);
+       Map<Integer, Subtask> subtasksCopy = epic.getSubtasks().entrySet().stream()
+               .collect(Collectors.toMap(Map.Entry::getKey, e -> new Subtask(e.getValue())));
+
+        this.subtasks = subtasksCopy;
+    }
+
+    public Epic(Task task, Map<Integer, Subtask> subtasks) {
+        super(task);
+        this.subtasks = subtasks;
     }
 
     public void addOrUpdateSubtask(Subtask subtask) {

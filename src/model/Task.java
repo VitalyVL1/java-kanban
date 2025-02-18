@@ -3,7 +3,7 @@ package model;
 import java.util.Objects;
 
 public class Task {
-    private int id;
+    private Integer id;
     private String title;
     private String description;
     private TaskStatus status;
@@ -14,7 +14,14 @@ public class Task {
         status = TaskStatus.NEW;
     }
 
-    public int getId() {
+    public Task(Task task) {
+        this.id = task.getId();
+        this.title = task.getTitle();
+        this.description = task.getDescription();
+        this.status = task.getStatus();
+    }
+
+    public Integer getId() {
         return id;
     }
 

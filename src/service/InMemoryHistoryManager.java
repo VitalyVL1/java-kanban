@@ -1,6 +1,8 @@
 package service;
 
 import manager.HistoryManager;
+import model.Epic;
+import model.Subtask;
 import model.Task;
 
 import java.util.ArrayList;
@@ -17,7 +19,14 @@ public class InMemoryHistoryManager implements HistoryManager {
             history.removeFirst();
         }
 
-        history.add(task);
+        if (task instanceof Epic) {
+            history.add(new Epic((Epic) task));
+        } else if (task instanceof Subtask) {
+            history.add(new Subtask((Subtask) task));
+        } else {
+            history.add(new Task(task));
+        }
+
     }
 
     @Override

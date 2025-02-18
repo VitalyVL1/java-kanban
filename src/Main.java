@@ -38,12 +38,12 @@ public class Main {
         manager.getTask(task1.getId());
         manager.getTask(task2.getId());
         manager.getTask(task3.getId());
-        manager.getEpic(epic1.getId());
-        manager.getEpic(epic2.getId());
-        manager.getEpic(epic3.getId());
         manager.getSubtask(subtask1.getId());
         manager.getSubtask(subtask2.getId());
         manager.getSubtask(subtask3.getId());
+        manager.getEpic(epic1.getId());
+        manager.getEpic(epic2.getId());
+        manager.getEpic(epic3.getId());
 
         System.out.println("manager.getTasks() = " + manager.getTasks());
         System.out.println("manager.getEpics() = " + manager.getEpics());
@@ -74,6 +74,9 @@ public class Main {
         epic3.setStatus(TaskStatus.DONE);//Проверяем что нельзя установить принудительно статус в Эпике
         manager.updateEpic(epic3);
         manager.getEpic(epic3.getId());
+
+        manager.getEpic(epic1.getId());
+        manager.getEpic(epic2.getId());
 
         System.out.println("-".repeat(20));
         System.out.println("After status changing");
