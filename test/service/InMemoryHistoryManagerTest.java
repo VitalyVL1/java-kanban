@@ -13,28 +13,62 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
-    HistoryManager historyManager;
-    Task task;
-    Epic epic;
-    Subtask subtask;
+    private static HistoryManager historyManager;
+    private static Task task;
+    private static Epic epic;
+    private static Subtask subtask;
 
     @BeforeEach
     void setUp() {
         historyManager = Managers.getDefaultHistory();
-        task = new Task("Task1","Description Task1");
-        epic = new Epic("Epic1","Description Epic1");
+        task = new Task("Task1", "Description Task1");
+        epic = new Epic("Epic1", "Description Epic1");
         subtask = new Subtask("Subtask1", "Description Subtask1", epic);
     }
 
     @Test
-    void add() {
+    void testAdd_ShouldAddTaskToHistory() {
         historyManager.add(task);
         final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
-        assertEquals(1, history.size(), "История не пустая.");
+        assertEquals(1, history.size(), "Task не добавлен в историю");
     }
 
     @Test
-    void getHistory() {
+    void testGetHistory_ShouldReturnCorrectHistory() {
+        final String description = "Description";
+        final String newDescription = "New Description";
+
+        task.setDescription(description);
+        epic.setDescription(description);
+        subtask.setDescription(description);
+
+        historyManager.add(task);
+        historyManager.add(epic);
+        historyManager.add(subtask);
+
+        final List<Task> history = historyManager.getHistory();
+        assertEquals(3, history.size(), "В историю добавлены не все объекты");
+
+
+        task.setDescription(newDescription);
+        epic.setDescription(newDescription);
+        subtask.setDescription(newDescription);
+
+        historyManager.add(task);
+        historyManager.add(epic);
+        historyManager.add(subtask);
+
+        final List<Task> newHistory = historyManager.getHistory();
+
+        for (int i = 0; i < newHistory.size(); i++) {
+            Task newTask = newHistory.get(i);
+
+            if (i < 3) {
+                assertEquals(description, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
+            } else{
+                assertEquals(newDescription, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
+            }
+        }
     }
 }
