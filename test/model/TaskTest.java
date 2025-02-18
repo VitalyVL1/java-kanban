@@ -21,7 +21,7 @@ class TaskTest {
         task1.setId(1);
         task2.setId(1);
 
-        assertTrue(task1.equals(task2), "Tasks не равны друг другу");
+        assertEquals(task1, task2, "Tasks не равны друг другу");
 
         Epic epic = new Epic("Epic", "Description Epic");
         Subtask subtask = new Subtask("Subtask", "Description Subtask", epic);
@@ -29,8 +29,8 @@ class TaskTest {
         epic.setId(1);
         subtask.setId(1);
 
-        assertFalse(task1.equals(epic),"Объекты Task и Epic не должны быть равными");
-        assertFalse(task1.equals(subtask),"Объекты Task и Subtask не должны быть равными");
+        assertNotEquals(task1, epic, "Объекты Task и Epic не должны быть равными");
+        assertNotEquals(task1, subtask, "Объекты Task и Subtask не должны быть равными");
     }
 
     @Test

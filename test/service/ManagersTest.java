@@ -10,13 +10,13 @@ class ManagersTest {
 
     @Test
     void testGetDefault_ShouldReturnDefaultTaskManager() {
-        assertTrue(Managers.getDefault() instanceof TaskManager,
+        assertInstanceOf(TaskManager.class, Managers.getDefault(),
                 "Default task manager должен имплементировать TaskManager");
     }
 
     @Test
     void testGetDefaultHistoryManager_ShouldReturnDefaultHistoryManager() {
-        assertTrue(Managers.getDefaultHistory() instanceof HistoryManager,
+        assertInstanceOf(HistoryManager.class, Managers.getDefaultHistory(),
                 "Default history manager должен имплементировать HistoryManager");
     }
 }
