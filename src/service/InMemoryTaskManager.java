@@ -99,23 +99,30 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic removeEpic(int id) {
         Epic epic = epics.remove(id);
-        List<Integer> subtaskIdList = epic.getSubtasks().values().stream().map(Task::getId).toList();
 
-        for (int subtaskId : subtaskIdList) {
-            subtasks.remove(subtaskId);
-        }
+        historyManager.remove(epic);
+
+        epic.getSubtasks().values().stream()
+                .forEach(subtask -> {
+                    historyManager.remove(subtask);
+                    subtasks.remove(subtask.getId());
+                });
 
         return epic;
     }
 
     @Override
     public Task removeTask(int id) {
-        return tasks.remove(id);
+        Task task = tasks.remove(id);
+        historyManager.remove(task);
+        return task;
     }
 
     @Override
     public Subtask removeSubtask(int id) {
         Subtask subtask = subtasks.remove(id);
+        historyManager.remove(subtask);
+
         Epic epic = subtask.getEpic();
         epic.removeSubtask(subtask);
         checkEpicStatus(epic);
@@ -133,23 +140,30 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEpics() {
+        epics.values().stream().forEach(historyManager::remove);
+
+        subtasks.values().stream().forEach(historyManager::remove);
+
         epics.clear();
         subtasks.clear();
     }
 
     @Override
     public void clearTasks() {
+        tasks.values().stream().forEach(historyManager::remove);
+
         tasks.clear();
     }
 
     @Override
     public void clearSubtasks() {
-        List<Epic> epicList = epics.values().stream().toList();
+        epics.values().stream()
+                .forEach(epic -> {
+                    epic.getSubtasks().clear();
+                    checkEpicStatus(epic);
+                });
 
-        for (Epic epic : epicList) {
-            epic.getSubtasks().clear();
-            checkEpicStatus(epic);
-        }
+        subtasks.values().stream().forEach(historyManager::remove);
 
         subtasks.clear();
     }

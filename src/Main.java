@@ -99,6 +99,7 @@ public class Main {
         System.out.println("manager.getAllSubtasksByEpic(epic1) = " + manager.getAllSubtasksByEpic(epic1));
         System.out.println("manager.getAllSubtasksByEpic(epic2) = " + manager.getAllSubtasksByEpic(epic2));
         System.out.println("manager.getAllSubtasksByEpic(epic3) = " + manager.getAllSubtasksByEpic(epic3));
+        System.out.println("manager.getHistory() = " + manager.getHistory());
 
         manager.clearSubtasks();
         manager.clearTasks();
@@ -111,6 +112,7 @@ public class Main {
         System.out.println("manager.getAllSubtasksByEpic(epic1) = " + manager.getAllSubtasksByEpic(epic1));
         System.out.println("manager.getAllSubtasksByEpic(epic2) = " + manager.getAllSubtasksByEpic(epic2));
         System.out.println("manager.getAllSubtasksByEpic(epic3) = " + manager.getAllSubtasksByEpic(epic3));
+        System.out.println("manager.getHistory() = " + manager.getHistory());
 
         manager.clearEpics();
 

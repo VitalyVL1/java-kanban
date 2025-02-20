@@ -33,4 +33,15 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         return new ArrayList<>(history);
     }
+
+    @Override
+    public void remove(Task task) {
+        if (task == null || history.isEmpty()) {
+            return;
+        }
+
+        while (history.contains(task)) {
+            history.remove(task);
+        }
+    }
 }

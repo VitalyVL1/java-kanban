@@ -14,10 +14,8 @@ public class Epic extends Task {
 
     public Epic(Epic epic) {
         super(epic);
-       Map<Integer, Subtask> subtasksCopy = epic.getSubtasks().entrySet().stream()
-               .collect(Collectors.toMap(Map.Entry::getKey, e -> new Subtask(e.getValue())));
-
-        this.subtasks = subtasksCopy;
+        this.subtasks = epic.getSubtasks().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new Subtask(e.getValue())));
     }
 
     public Epic(Task task, Map<Integer, Subtask> subtasks) {
@@ -33,8 +31,8 @@ public class Epic extends Task {
         return subtasks;
     }
 
-    public Subtask removeSubtask(Subtask subtask) {
-        return subtasks.remove(subtask.getId());
+    public void removeSubtask(Subtask subtask) {
+        subtasks.remove(subtask.getId());
     }
 
     public Subtask getSubtaskById(int id) {

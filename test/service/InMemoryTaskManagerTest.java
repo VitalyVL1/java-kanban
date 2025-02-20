@@ -1,5 +1,6 @@
 package service;
 
+import manager.HistoryManager;
 import manager.TaskManager;
 import model.Epic;
 import model.Subtask;
@@ -351,4 +352,108 @@ class InMemoryTaskManagerTest {
         assertTrue(history.contains(subtask2),"История не сохранила Subtask");
     }
 
+    @Test
+    void testRemoveTaskSubtaskEpic_ShouldRemoveTaskSubtaskEpicFromHistory() {
+        taskManager.addTask(task);
+        taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+
+        taskManager.getTask(task.getId());
+        taskManager.getEpic(epic.getId());
+        taskManager.getSubtask(subtask1.getId());
+        taskManager.getSubtask(subtask2.getId());
+
+        task.setDescription("Description");
+        epic.setDescription("Description");
+        subtask1.setDescription("Description");
+        subtask2.setDescription("Description");
+
+        taskManager.updateTask(task);
+        taskManager.updateEpic(epic);
+        taskManager.updateSubtask(subtask1);
+        taskManager.updateSubtask(subtask2);
+
+        taskManager.getTask(task.getId());
+        taskManager.getEpic(epic.getId());
+        taskManager.getSubtask(subtask1.getId());
+        taskManager.getSubtask(subtask2.getId());
+
+        final List<Task> historyBeforeRemove = taskManager.getHistory();
+
+        taskManager.removeTask(task.getId());
+        final List<Task> historyAfterRemoveTask = taskManager.getHistory();
+
+        taskManager.removeSubtask(subtask1.getId());
+        final List<Task> historyAfterRemoveSubtask1 = taskManager.getHistory();
+
+        taskManager.removeEpic(epic.getId());
+        final List<Task> historyAfterRemoveEpic= taskManager.getHistory();
+
+        assertEquals(8, historyBeforeRemove.size(),"В историю попали не все элементы");
+
+        assertFalse(historyAfterRemoveTask.contains(task),"Task не удален из истории");
+        assertFalse(historyAfterRemoveSubtask1.contains(subtask1),"Subtask не удален из истории");
+        assertFalse(historyAfterRemoveEpic.contains(epic),"Epic не удален из истории");
+        assertFalse(historyAfterRemoveEpic.contains(subtask2),"Subtask относящийся к удаленному Epic не удален из истории");
+
+        assertEquals(0,historyAfterRemoveEpic.size(),"В истории удалены не все элементы");
+    }
+
+
+    @Test
+    void testClearTaskSubtaskEpic_ShouldRemoveAllTaskSubtaskEpicFromHistory() {
+        Subtask subtask3 = new Subtask("Subtask3","Description Subtask3", epic);
+
+        taskManager.addTask(task);
+        taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+
+        taskManager.getTask(task.getId());
+        taskManager.getEpic(epic.getId());
+        taskManager.getSubtask(subtask1.getId());
+        taskManager.getSubtask(subtask2.getId());
+
+        task.setDescription("Description");
+        epic.setDescription("Description");
+        subtask1.setDescription("Description");
+        subtask2.setDescription("Description");
+
+        taskManager.updateTask(task);
+        taskManager.updateEpic(epic);
+        taskManager.updateSubtask(subtask1);
+        taskManager.updateSubtask(subtask2);
+
+        taskManager.getTask(task.getId());
+        taskManager.getEpic(epic.getId());
+        taskManager.getSubtask(subtask1.getId());
+        taskManager.getSubtask(subtask2.getId());
+
+        final List<Task> historyBeforeClear = taskManager.getHistory();
+
+        taskManager.clearTasks();
+        final List<Task> historyAfterClearTask = taskManager.getHistory();
+
+        taskManager.clearSubtasks();
+        final List<Task> historyAfterClearSubtask = taskManager.getHistory();
+
+        taskManager.addSubtask(subtask3);
+
+        taskManager.getSubtask(subtask3.getId());
+
+        taskManager.clearEpics();
+        final List<Task> historyAfterClearEpic= taskManager.getHistory();
+
+        assertEquals(8, historyBeforeClear.size(),"В историю попали не все элементы");
+
+        assertFalse(historyAfterClearTask.contains(task),"Task не удален из истории");
+        assertFalse(historyAfterClearSubtask.contains(subtask1),"Subtask не удален из истории");
+        assertFalse(historyAfterClearSubtask.contains(subtask2),"Subtask не удален из истории");
+
+        assertFalse(historyAfterClearEpic.contains(epic),"Epic не удален из истории");
+        assertFalse(historyAfterClearEpic.contains(subtask3),"Subtask относящийся к удаленному Epic не удален из истории");
+
+        assertEquals(0,historyAfterClearEpic.size(),"В истории удалены не все элементы");
+    }
 }

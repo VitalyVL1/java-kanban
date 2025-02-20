@@ -66,9 +66,32 @@ class InMemoryHistoryManagerTest {
 
             if (i < 3) {
                 assertEquals(description, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
-            } else{
+            } else {
                 assertEquals(newDescription, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
             }
         }
+    }
+
+    @Test
+    void testRemove_ShouldRemoveTaskFromHistory() {
+
+        historyManager.add(task);
+        historyManager.add(epic);
+        historyManager.add(subtask);
+        historyManager.add(task);
+        historyManager.add(epic);
+        historyManager.add(subtask);
+
+        final List<Task> historyBeforeRemove = historyManager.getHistory();
+
+        assertEquals(6, historyBeforeRemove.size(), "Не все элементы добавлены в History");
+
+        historyManager.remove(task);
+        historyManager.remove(epic);
+        historyManager.remove(subtask);
+
+        final List<Task> historyAfterRemove = historyManager.getHistory();
+
+        assertEquals(0,historyAfterRemove.size(),"Не все элементы удалены");
     }
 }
