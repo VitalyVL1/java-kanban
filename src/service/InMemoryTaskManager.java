@@ -102,8 +102,8 @@ public class InMemoryTaskManager implements TaskManager {
 
         historyManager.remove(epic);
 
-        epic.getSubtasks().values().stream()
-                .forEach(subtask -> {
+        epic.getSubtasks().values().forEach(
+                subtask -> {
                     historyManager.remove(subtask);
                     subtasks.remove(subtask.getId());
                 });
@@ -140,9 +140,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEpics() {
-        epics.values().stream().forEach(historyManager::remove);
+        epics.values().forEach(historyManager::remove);
 
-        subtasks.values().stream().forEach(historyManager::remove);
+        subtasks.values().forEach(historyManager::remove);
 
         epics.clear();
         subtasks.clear();
@@ -150,20 +150,20 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearTasks() {
-        tasks.values().stream().forEach(historyManager::remove);
+        tasks.values().forEach(historyManager::remove);
 
         tasks.clear();
     }
 
     @Override
     public void clearSubtasks() {
-        epics.values().stream()
-                .forEach(epic -> {
+        epics.values().forEach(
+                epic -> {
                     epic.getSubtasks().clear();
                     checkEpicStatus(epic);
                 });
 
-        subtasks.values().stream().forEach(historyManager::remove);
+        subtasks.values().forEach(historyManager::remove);
 
         subtasks.clear();
     }
