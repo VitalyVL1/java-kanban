@@ -54,8 +54,7 @@ class InMemoryHistoryManagerTest {
         final List<Task> history = historyManager.getHistory();
         assertFalse(history.size() < 3, "В историю добавлены не все объекты");
 
-        for (int i = 0; i < history.size(); i++) {
-            Task newTask = history.get(i);
+        for (Task newTask : history) {
             assertEquals(description, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
         }
 
@@ -118,14 +117,14 @@ class InMemoryHistoryManagerTest {
 
         final List<Task> history = historyManager.getHistory();
 
-        for(Task task : history) {
+        for (Task task : history) {
             task.setDescription("CHECK");
         }
 
         final List<Task> checkHistory = historyManager.getHistory();
 
-        for(Task task : checkHistory) {
-            assertNotEquals("CHECK", task.getDescription(),task.getClass()
+        for (Task task : checkHistory) {
+            assertNotEquals("CHECK", task.getDescription(), task.getClass()
                     + " полученный из истории объект изменен с помощью setter'а");
         }
 

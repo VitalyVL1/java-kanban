@@ -1,6 +1,5 @@
 package service;
 
-import manager.HistoryManager;
 import manager.TaskManager;
 import model.Epic;
 import model.Subtask;
@@ -477,7 +476,7 @@ class InMemoryTaskManagerTest {
         checkGet.add(taskManager.getSubtask(subtask1.getId()));
         checkGet.add(taskManager.getSubtask(subtask2.getId()));
 
-        for(Task t: checkGet){
+        for (Task t : checkGet) {
             assertNotEquals("CHECK", t.getTitle(), t.getClass()
                     + " попали изменения get object с помощью setter'ов");
         }
