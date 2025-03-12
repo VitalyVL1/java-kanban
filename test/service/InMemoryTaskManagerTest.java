@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -310,9 +311,9 @@ class InMemoryTaskManagerTest {
         assertEquals(-1, idEpic, "Эпик заменил имеющийся");
         assertEquals(-1, idSubtask, "Подзадача заменила имеющуюся");
 
-        presetIdTask.setId(2);
-        presetIdEpic.setId(2);
-        presetIdSubtask.setId(2);
+        presetIdTask.setId(subtask1.getId() + 1);
+        presetIdEpic.setId(subtask1.getId() + 2);
+        presetIdSubtask.setId(subtask1.getId() + 3);
 
         taskManager.addTask(presetIdTask);
         taskManager.addEpic(presetIdEpic);
@@ -326,9 +327,9 @@ class InMemoryTaskManagerTest {
         int epicSize = taskManager.getEpics().size();
         int subtaskSize = taskManager.getSubtasks().size();
 
-        assertEquals(3,taskSize,"Генерация Task id происходит некорректно");
-        assertEquals(3,epicSize,"Генерация Epic id происходит некорректно");
-        assertEquals(3,subtaskSize,"Генерация Subtask id происходит некорректно");
+        assertEquals(3, taskSize, "Генерация Task id происходит некорректно");
+        assertEquals(3, epicSize, "Генерация Epic id происходит некорректно");
+        assertEquals(3, subtaskSize, "Генерация Subtask id происходит некорректно");
     }
 
     @Test
@@ -345,11 +346,11 @@ class InMemoryTaskManagerTest {
 
         List<Task> history = taskManager.getHistory();
 
-        assertEquals(4, history.size(),"Получена некорректная история");
-        assertTrue(history.contains(task),"История не сохранила Task");
-        assertTrue(history.contains(epic),"История не сохранила Epic");
-        assertTrue(history.contains(subtask1),"История не сохранила Subtask");
-        assertTrue(history.contains(subtask2),"История не сохранила Subtask");
+        assertEquals(4, history.size(), "Получена некорректная история");
+        assertTrue(history.contains(task), "История не сохранила Task");
+        assertTrue(history.contains(epic), "История не сохранила Epic");
+        assertTrue(history.contains(subtask1), "История не сохранила Subtask");
+        assertTrue(history.contains(subtask2), "История не сохранила Subtask");
     }
 
     @Test
@@ -388,22 +389,22 @@ class InMemoryTaskManagerTest {
         final List<Task> historyAfterRemoveSubtask1 = taskManager.getHistory();
 
         taskManager.removeEpic(epic.getId());
-        final List<Task> historyAfterRemoveEpic= taskManager.getHistory();
+        final List<Task> historyAfterRemoveEpic = taskManager.getHistory();
 
-        assertEquals(8, historyBeforeRemove.size(),"В историю попали не все элементы");
+        assertEquals(4, historyBeforeRemove.size(), "В историю попали не все элементы");
 
-        assertFalse(historyAfterRemoveTask.contains(task),"Task не удален из истории");
-        assertFalse(historyAfterRemoveSubtask1.contains(subtask1),"Subtask не удален из истории");
-        assertFalse(historyAfterRemoveEpic.contains(epic),"Epic не удален из истории");
-        assertFalse(historyAfterRemoveEpic.contains(subtask2),"Subtask относящийся к удаленному Epic не удален из истории");
+        assertFalse(historyAfterRemoveTask.contains(task), "Task не удален из истории");
+        assertFalse(historyAfterRemoveSubtask1.contains(subtask1), "Subtask не удален из истории");
+        assertFalse(historyAfterRemoveEpic.contains(epic), "Epic не удален из истории");
+        assertFalse(historyAfterRemoveEpic.contains(subtask2), "Subtask относящийся к удаленному Epic не удален из истории");
 
-        assertEquals(0,historyAfterRemoveEpic.size(),"В истории удалены не все элементы");
+        assertEquals(0, historyAfterRemoveEpic.size(), "В истории удалены не все элементы");
     }
 
 
     @Test
     void testClearTaskSubtaskEpic_ShouldRemoveAllTaskSubtaskEpicFromHistory() {
-        Subtask subtask3 = new Subtask("Subtask3","Description Subtask3", epic);
+        Subtask subtask3 = new Subtask("Subtask3", "Description Subtask3", epic);
 
         taskManager.addTask(task);
         taskManager.addEpic(epic);
@@ -443,17 +444,63 @@ class InMemoryTaskManagerTest {
         taskManager.getSubtask(subtask3.getId());
 
         taskManager.clearEpics();
-        final List<Task> historyAfterClearEpic= taskManager.getHistory();
+        final List<Task> historyAfterClearEpic = taskManager.getHistory();
 
-        assertEquals(8, historyBeforeClear.size(),"В историю попали не все элементы");
+        assertEquals(4, historyBeforeClear.size(), "В историю попали не все элементы");
 
-        assertFalse(historyAfterClearTask.contains(task),"Task не удален из истории");
-        assertFalse(historyAfterClearSubtask.contains(subtask1),"Subtask не удален из истории");
-        assertFalse(historyAfterClearSubtask.contains(subtask2),"Subtask не удален из истории");
+        assertFalse(historyAfterClearTask.contains(task), "Task не удален из истории");
+        assertFalse(historyAfterClearSubtask.contains(subtask1), "Subtask не удален из истории");
+        assertFalse(historyAfterClearSubtask.contains(subtask2), "Subtask не удален из истории");
 
-        assertFalse(historyAfterClearEpic.contains(epic),"Epic не удален из истории");
-        assertFalse(historyAfterClearEpic.contains(subtask3),"Subtask относящийся к удаленному Epic не удален из истории");
+        assertFalse(historyAfterClearEpic.contains(epic), "Epic не удален из истории");
+        assertFalse(historyAfterClearEpic.contains(subtask3), "Subtask относящийся к удаленному Epic не удален из истории");
 
-        assertEquals(0,historyAfterClearEpic.size(),"В истории удалены не все элементы");
+        assertEquals(0, historyAfterClearEpic.size(), "В истории удалены не все элементы");
+    }
+
+    @Test
+    void testSetDataInTaskSubtaskEpic_ShouldNotChangeTaskSubtaskEpicFromTaskManager() {
+        taskManager.addTask(task);
+        taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+
+        taskManager.getTask(task.getId()).setTitle("CHECK");
+        taskManager.getEpic(epic.getId()).setTitle("CHECK");
+        taskManager.getSubtask(subtask1.getId()).setTitle("CHECK");
+        taskManager.getSubtask(subtask2.getId()).setTitle("CHECK");
+
+        final List<Task> checkGet = new ArrayList<>();
+
+        checkGet.add(taskManager.getTask(task.getId()));
+        checkGet.add(taskManager.getEpic(epic.getId()));
+        checkGet.add(taskManager.getSubtask(subtask1.getId()));
+        checkGet.add(taskManager.getSubtask(subtask2.getId()));
+
+        for(Task t: checkGet){
+            assertNotEquals("CHECK", t.getTitle(), t.getClass()
+                    + " попали изменения get object с помощью setter'ов");
+        }
+
+        final List<Task> listGetAll = new ArrayList<>();
+
+        listGetAll.addAll(taskManager.getEpics());
+        listGetAll.addAll(taskManager.getSubtasks());
+        listGetAll.addAll(taskManager.getTasks());
+
+        for (Task task : listGetAll) {
+            task.setTitle("CHECK_ALL");
+        }
+
+        final List<Task> checklistGetAll = new ArrayList<>();
+
+        checklistGetAll.addAll(taskManager.getEpics());
+        checklistGetAll.addAll(taskManager.getSubtasks());
+        checklistGetAll.addAll(taskManager.getTasks());
+
+        for (Task t : checklistGetAll) {
+            assertNotEquals("CHECK_ALL", t.getTitle(), t.getClass()
+                    + " попали изменения getAll object с помощью setter'ов");
+        }
     }
 }

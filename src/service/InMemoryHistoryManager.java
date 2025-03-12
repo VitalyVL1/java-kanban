@@ -6,42 +6,107 @@ import model.Subtask;
 import model.Task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    public static final int HISTORY_SIZE = 10;
 
-    private final List<Task> history = new ArrayList<>(HISTORY_SIZE);
+    private final Map<Integer, Node> history = new HashMap<>();
+    private Node first;
+    private Node last;
 
     @Override
     public void add(Task task) {
-        if (history.size() == HISTORY_SIZE) {
-            history.removeFirst();
+        if (task == null) return;
+
+        if (history.containsKey(task.getId())) {
+            remove(task.getId());
         }
 
-        if (task instanceof Epic) {
-            history.add(new Epic((Epic) task));
-        } else if (task instanceof Subtask) {
-            history.add(new Subtask((Subtask) task));
+        if (task instanceof Subtask) {
+            history.put(task.getId(), linkLast(new Subtask((Subtask) task)));
+        } else if (task instanceof Epic) {
+            history.put(task.getId(), linkLast(new Epic((Epic) task)));
         } else {
-            history.add(new Task(task));
+            history.put(task.getId(), linkLast(new Task(task)));
         }
-
     }
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
+        return getTasks();
     }
 
     @Override
-    public void remove(Task task) {
-        if (task == null || history.isEmpty()) {
+    public void remove(int id) {
+        if (history.isEmpty() || !history.containsKey(id)) {
             return;
         }
 
-        while (history.contains(task)) {
-            history.remove(task);
+        removeNode(history.remove(id));
+    }
+
+    private class Node<T extends Task> {
+        private T data;
+        private Node<T> next;
+        private Node<T> previous;
+
+        public Node(T data) {
+            this.data = data;
+        }
+    }
+
+    public Node linkLast(Task task) {
+        if (task == null) return null;
+
+        Node newNode = new Node(task);
+
+        if (first == null) {
+            first = newNode;
+        } else {
+            last.next = newNode;
+            newNode.previous = last;
+        }
+        last = newNode;
+
+        return newNode;
+    }
+
+    private List<Task> getTasks() {
+        List<Task> tasks = new ArrayList<>();
+        Node current = first;
+
+        while (current != null) {
+            Task temp = current.data;
+
+            if (temp instanceof Subtask) {
+                tasks.add(new Subtask((Subtask) temp));
+            } else if (temp instanceof Epic) {
+                tasks.add(new Epic((Epic) temp));
+            } else {
+                tasks.add(new Task(temp));
+            }
+
+            current = current.next;
+        }
+
+        return tasks;
+    }
+
+    private void removeNode(Node node) {
+        if (node == null) return;
+
+        if (node == first) {
+            first = first.next;
+        } else {
+            node.previous.next = node.next;
+        }
+
+        if (node == last) {
+            last = last.previous;
+        } else {
+            node.next.previous = node.previous;
         }
     }
 }
