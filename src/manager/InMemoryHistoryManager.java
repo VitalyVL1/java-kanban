@@ -54,6 +54,14 @@ public class InMemoryHistoryManager implements HistoryManager {
         public Node(T data) {
             this.data = data;
         }
+
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        public boolean hasPrevious() {
+            return previous != null;
+        }
     }
 
     private Node<Task> linkLast(Task task) {
@@ -99,13 +107,13 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (node == first) {
             first = first.next;
         } else {
-            node.previous.next = node.next;
+            if (node.hasPrevious()) node.previous.next = node.next;
         }
 
         if (node == last) {
             last = last.previous;
         } else {
-            node.next.previous = node.previous;
+            if (node.hasNext()) node.next.previous = node.previous;
         }
     }
 }
