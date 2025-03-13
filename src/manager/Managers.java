@@ -1,7 +1,4 @@
-package service;
-
-import manager.HistoryManager;
-import manager.TaskManager;
+package manager;
 
 public class Managers {
 

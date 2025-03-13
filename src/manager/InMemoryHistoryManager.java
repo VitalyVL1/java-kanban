@@ -1,6 +1,5 @@
-package service;
+package manager;
 
-import manager.HistoryManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
