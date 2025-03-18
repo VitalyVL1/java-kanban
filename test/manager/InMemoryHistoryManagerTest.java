@@ -1,12 +1,12 @@
-package service;
+package manager;
 
-import manager.HistoryManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,6 +24,9 @@ class InMemoryHistoryManagerTest {
         task = new Task("Task1", "Description Task1");
         epic = new Epic("Epic1", "Description Epic1");
         subtask = new Subtask("Subtask1", "Description Subtask1", epic);
+        task.setId(1);
+        epic.setId(2);
+        subtask.setId(3);
     }
 
     @Test
@@ -48,8 +51,11 @@ class InMemoryHistoryManagerTest {
         historyManager.add(subtask);
 
         final List<Task> history = historyManager.getHistory();
-        assertEquals(3, history.size(), "В историю добавлены не все объекты");
+        assertFalse(history.size() < 3, "В историю добавлены не все объекты");
 
+        for (Task newTask : history) {
+            assertEquals(description, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
+        }
 
         task.setDescription(newDescription);
         epic.setDescription(newDescription);
@@ -60,15 +66,21 @@ class InMemoryHistoryManagerTest {
         historyManager.add(subtask);
 
         final List<Task> newHistory = historyManager.getHistory();
+        final List<Task> checkHistory = new LinkedList<>();
+
+        checkHistory.add(task);
+        checkHistory.add(epic);
+        checkHistory.add(subtask);
+
+        assertFalse(history.size() < 3, "В историю добавлены не все объекты");
+        assertFalse(history.size() > 3, "В историю добавились, а не обновились объекты");
 
         for (int i = 0; i < newHistory.size(); i++) {
             Task newTask = newHistory.get(i);
+            Task checkTask = checkHistory.get(i);
 
-            if (i < 3) {
-                assertEquals(description, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
-            } else {
-                assertEquals(newDescription, newTask.getDescription(), newTask.getClass() + " не верно сохранена история");
-            }
+            assertEquals(newDescription, newTask.getDescription(), newTask.getClass() + " не верно обновились данные");
+            assertEquals(checkTask, newTask, newTask.getClass() + " не верный порядок в истории");
         }
     }
 
@@ -84,14 +96,37 @@ class InMemoryHistoryManagerTest {
 
         final List<Task> historyBeforeRemove = historyManager.getHistory();
 
-        assertEquals(6, historyBeforeRemove.size(), "Не все элементы добавлены в History");
+        assertFalse(historyBeforeRemove.size() < 3, "В историю добавлены не все объекты");
+        assertFalse(historyBeforeRemove.size() > 3, "В историю добавились, а не обновились объекты");
 
-        historyManager.remove(task);
-        historyManager.remove(epic);
-        historyManager.remove(subtask);
+        historyManager.remove(task.getId());
+        historyManager.remove(epic.getId());
+        historyManager.remove(subtask.getId());
 
         final List<Task> historyAfterRemove = historyManager.getHistory();
 
-        assertEquals(0,historyAfterRemove.size(),"Не все элементы удалены");
+        assertEquals(0, historyAfterRemove.size(), "Не все элементы удалены");
+    }
+
+    @Test
+    void testSetTaskSubtaskEpic_ShouldNotChangeCurrentDataInHistory() {
+        historyManager.add(task);
+        historyManager.add(epic);
+        historyManager.add(subtask);
+
+        final List<Task> history = historyManager.getHistory();
+
+        for (Task task : history) {
+            task.setDescription("CHECK");
+        }
+
+        final List<Task> checkHistory = historyManager.getHistory();
+
+        for (Task task : checkHistory) {
+            assertNotEquals("CHECK", task.getDescription(), task.getClass()
+                    + " полученный из истории объект изменен с помощью setter'а");
+        }
+
+
     }
 }
