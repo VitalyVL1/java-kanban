@@ -143,8 +143,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         try {
             if (!file.exists()) {
-                System.out.println("По указанному пути файл отсутствует");
-                return null;
+                System.out.println("По указанному пути файл отсутствует!");
+                file.createNewFile();
+                return taskManager;
             }
 
             List<String> lines = Files.readAllLines(file.toPath());
