@@ -167,6 +167,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         checkEpicStatus(epic);
+
+        epic.getSubtasks().values().forEach(subtask -> subtasks.put(subtask.getId(), subtask));
+
         epics.put(epic.getId(), epic);
     }
 
@@ -177,6 +180,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
+        Epic epic = epics.get(subtask.getEpic().getId());
+
+        if (epic != null) {
+            epic.addOrUpdateSubtask(subtask);
+        }
+
+        subtask.setEpic(epic);
         subtasks.put(subtask.getId(), subtask);
         checkEpicStatus(subtask.getEpic());
     }
