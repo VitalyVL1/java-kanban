@@ -7,11 +7,13 @@ public class Task {
     private String title;
     private String description;
     private TaskStatus status;
+    private TaskType type;
 
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
         status = TaskStatus.NEW;
+        type = TaskType.TASK;
     }
 
     public Task(Task task) {
@@ -19,6 +21,7 @@ public class Task {
         this.title = task.getTitle();
         this.description = task.getDescription();
         this.status = task.getStatus();
+        this.type = task.getType();
     }
 
     public Integer getId() {
@@ -70,9 +73,18 @@ public class Task {
     public String toString() {
         return "Task{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
+                ", type=" + getType() +
+                ", title=" + title +
+                ", description=" + description +
                 ", status=" + status +
                 '}';
+    }
+
+    public TaskType getType() {
+        return type;
+    }
+
+    public void setType(TaskType type) {
+        this.type = type;
     }
 }

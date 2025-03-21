@@ -10,6 +10,7 @@ public class Epic extends Task {
     public Epic(String title, String description) {
         super(title, description);
         subtasks = new HashMap<>();
+        setType(TaskType.EPIC);
     }
 
     public Epic(Epic epic) {
@@ -43,8 +44,9 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "id=" + getId() +
-                ", title='" + getTitle() + '\'' +
-                ", description='" + getDescription() + '\'' +
+                ", type=" + getType() +
+                ", title=" + getTitle() +
+                ", description=" + getDescription() +
                 ", status=" + getStatus() +
                 '}';
     }
