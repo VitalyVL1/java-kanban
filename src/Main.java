@@ -128,7 +128,7 @@ public class Main {
         System.out.println("manager.getSubtasks() = " + manager.getSubtasks());
         System.out.println("manager.getHistory() = " + manager.getHistory());
 
-        ////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         task1 = new Task("First Task", "My first task");
         task2 = new Task("Second Task", "My second task");
@@ -178,10 +178,6 @@ public class Main {
         subtask2.setStatus(TaskStatus.DONE);
         fileBackedManager.updateSubtask(subtask2);
 
-        subtask3 = fileBackedManager.getSubtask(subtask3.getId());
-        subtask3.setStatus(TaskStatus.DONE);
-        fileBackedManager.updateSubtask(subtask3);
-
         subtask4 = fileBackedManager.getSubtask(subtask4.getId());
         subtask4.setStatus(TaskStatus.DONE);
         fileBackedManager.updateSubtask(subtask4);
@@ -215,7 +211,70 @@ public class Main {
         System.out.println("restoredFileManager.getAllSubtasksByEpic(epic2) = " + restoredFileManager.getAllSubtasksByEpic(epic2));
         System.out.println("restoredFileManager.getAllSubtasksByEpic(epic3) = " + restoredFileManager.getAllSubtasksByEpic(epic3));
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        fileBackedManager.removeSubtask(subtask2.getId());
+        fileBackedManager.removeEpic(epic3.getId());
+        fileBackedManager.removeTask(task1.getId());
+
+        restoredFileManager = FileBackedTaskManager.loadFromFile(path.toFile());
+
         System.out.println("-".repeat(20));
         System.out.println("-".repeat(20));
+        System.out.println("Before restoring files");
+        System.out.println("-".repeat(20));
+
+        System.out.println("fileBackedManager.getTasks() = " + fileBackedManager.getTasks());
+        System.out.println("fileBackedManager.getEpics() = " + fileBackedManager.getEpics());
+        System.out.println("fileBackedManager.getSubtasks() = " + fileBackedManager.getSubtasks());
+        System.out.println("fileBackedManager.getAllSubtasksByEpic(epic1) = " + fileBackedManager.getAllSubtasksByEpic(epic1));
+        System.out.println("fileBackedManager.getAllSubtasksByEpic(epic2) = " + fileBackedManager.getAllSubtasksByEpic(epic2));
+        System.out.println("fileBackedManager.getAllSubtasksByEpic(epic3) = " + fileBackedManager.getAllSubtasksByEpic(epic3));
+
+        System.out.println("-".repeat(20));
+        System.out.println("After restoring files");
+        System.out.println("-".repeat(20));
+
+        System.out.println("restoredFileManager.getTasks() = " + restoredFileManager.getTasks());
+        System.out.println("restoredFileManager.getEpics() = " + restoredFileManager.getEpics());
+        System.out.println("restoredFileManager.getSubtasks() = " + restoredFileManager.getSubtasks());
+        System.out.println("restoredFileManager.getAllSubtasksByEpic(epic1) = " + restoredFileManager.getAllSubtasksByEpic(epic1));
+        System.out.println("restoredFileManager.getAllSubtasksByEpic(epic2) = " + restoredFileManager.getAllSubtasksByEpic(epic2));
+        System.out.println("restoredFileManager.getAllSubtasksByEpic(epic3) = " + restoredFileManager.getAllSubtasksByEpic(epic3));
+
+        System.out.println("-".repeat(20));
+        System.out.println("-".repeat(20));
+
+        fileBackedManager.clearTasks();
+        fileBackedManager.clearEpics();
+
+        restoredFileManager = FileBackedTaskManager.loadFromFile(path.toFile());
+
+        System.out.println("-".repeat(20));
+        System.out.println("-".repeat(20));
+        System.out.println("Before restoring files");
+        System.out.println("-".repeat(20));
+
+        System.out.println("fileBackedManager.getTasks() = " + fileBackedManager.getTasks());
+        System.out.println("fileBackedManager.getEpics() = " + fileBackedManager.getEpics());
+        System.out.println("fileBackedManager.getSubtasks() = " + fileBackedManager.getSubtasks());
+        System.out.println("fileBackedManager.getAllSubtasksByEpic(epic1) = " + fileBackedManager.getAllSubtasksByEpic(epic1));
+        System.out.println("fileBackedManager.getAllSubtasksByEpic(epic2) = " + fileBackedManager.getAllSubtasksByEpic(epic2));
+        System.out.println("fileBackedManager.getAllSubtasksByEpic(epic3) = " + fileBackedManager.getAllSubtasksByEpic(epic3));
+
+        System.out.println("-".repeat(20));
+        System.out.println("After restoring files");
+        System.out.println("-".repeat(20));
+
+        System.out.println("restoredFileManager.getTasks() = " + restoredFileManager.getTasks());
+        System.out.println("restoredFileManager.getEpics() = " + restoredFileManager.getEpics());
+        System.out.println("restoredFileManager.getSubtasks() = " + restoredFileManager.getSubtasks());
+        System.out.println("restoredFileManager.getAllSubtasksByEpic(epic1) = " + restoredFileManager.getAllSubtasksByEpic(epic1));
+        System.out.println("restoredFileManager.getAllSubtasksByEpic(epic2) = " + restoredFileManager.getAllSubtasksByEpic(epic2));
+        System.out.println("restoredFileManager.getAllSubtasksByEpic(epic3) = " + restoredFileManager.getAllSubtasksByEpic(epic3));
+
+        System.out.println("-".repeat(20));
+        System.out.println("-".repeat(20));
+
     }
 }

@@ -17,4 +17,13 @@ class ManagersTest {
         assertInstanceOf(HistoryManager.class, Managers.getDefaultHistory(),
                 "Default history manager должен имплементировать HistoryManager");
     }
+
+    @Test
+    void testgetFileBackedTaskManager_ShouldReturnFileBackedTaskManager() {
+        assertInstanceOf(TaskManager.class, Managers.getFileBackedTaskManager("test"),
+                "FileBackedTaskManager должен имплементировать TaskManager");
+
+        assertInstanceOf(InMemoryTaskManager.class, Managers.getFileBackedTaskManager("test"),
+                "FileBackedTaskManager должен наследоваться от InMemoryTaskManager");
+    }
 }
