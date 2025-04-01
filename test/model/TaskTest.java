@@ -18,7 +18,7 @@ class TaskTest {
 
     @Test
     void testTaskEquals_ShouldReturnTrue() {
-        assertEquals(task1, task2,"сравнение с id = null, должен быть true");
+        assertEquals(task1, task2, "сравнение с id = null, должен быть true");
 
         task1.setId(1);
         task2.setId(1);
@@ -45,7 +45,7 @@ class TaskTest {
 
     @Test
     void testNullIdForNewTask_ShouldReturnNullWhenTaskIsNew() {
-        assertNull(task1.getId(),"Для нового объекта без указания id, id не равен null");
+        assertNull(task1.getId(), "Для нового объекта без указания id, id не равен null");
     }
 
     @Test
@@ -53,12 +53,12 @@ class TaskTest {
         int id = 1;
         task1.setId(id);
 
-        assertEquals(id,task1.getId(),"Возвращенный id не совпадает с установленным");
+        assertEquals(id, task1.getId(), "Возвращенный id не совпадает с установленным");
     }
 
     @Test
     void shouldReturnStatusNewForNewTask() {
-        assertEquals(TaskStatus.NEW, task1.getStatus(),"Статус не равен NEW для нового объекта");
+        assertEquals(TaskStatus.NEW, task1.getStatus(), "Статус не равен NEW для нового объекта");
     }
 
     @Test
@@ -66,15 +66,15 @@ class TaskTest {
         TaskStatus status = TaskStatus.IN_PROGRESS;
 
         task1.setStatus(status);
-        assertEquals(status, task1.getStatus(),"Статус не равен установленному");
+        assertEquals(status, task1.getStatus(), "Статус не равен установленному");
 
         status = TaskStatus.IN_PROGRESS;
         task1.setStatus(status);
-        assertEquals(status, task1.getStatus(),"Статус не равен установленному");
+        assertEquals(status, task1.getStatus(), "Статус не равен установленному");
 
         status = TaskStatus.NEW;
         task1.setStatus(status);
-        assertEquals(status, task1.getStatus(),"Статус не равен установленному");
+        assertEquals(status, task1.getStatus(), "Статус не равен установленному");
     }
 
     @Test
@@ -85,8 +85,8 @@ class TaskTest {
         task1.setDescription(taskDescription);
         task1.setTitle(taskTitle);
 
-        assertEquals(taskTitle, task1.getTitle(),"Title не соответствует установленному");
-        assertEquals(taskDescription, task1.getDescription(),"Description не соответствует установленному");
+        assertEquals(taskTitle, task1.getTitle(), "Title не соответствует установленному");
+        assertEquals(taskDescription, task1.getDescription(), "Description не соответствует установленному");
     }
 
 }

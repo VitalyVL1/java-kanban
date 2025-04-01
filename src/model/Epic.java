@@ -5,11 +5,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Epic extends Task {
-    private final Map<Integer, Subtask> subtasks;
+    private Map<Integer, Subtask> subtasks;
 
     public Epic(String title, String description) {
         super(title, description);
         subtasks = new HashMap<>();
+        setType(TaskType.EPIC);
     }
 
     public Epic(Epic epic) {
@@ -23,12 +24,21 @@ public class Epic extends Task {
         this.subtasks = subtasks;
     }
 
+    public Epic(Integer id, String title, String description, TaskStatus status, TaskType type, Map<Integer, Subtask> subtasks) {
+        super(id, title, description, status, type);
+        this.subtasks = subtasks;
+    }
+
     public void addOrUpdateSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
     }
 
     public Map<Integer, Subtask> getSubtasks() {
         return subtasks;
+    }
+
+    public void setSubtasks(Map<Integer, Subtask> subtasks) {
+        this.subtasks = subtasks;
     }
 
     public void removeSubtask(Subtask subtask) {
@@ -43,8 +53,9 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "id=" + getId() +
-                ", title='" + getTitle() + '\'' +
-                ", description='" + getDescription() + '\'' +
+                ", type=" + getType() +
+                ", title=" + getTitle() +
+                ", description=" + getDescription() +
                 ", status=" + getStatus() +
                 '}';
     }
