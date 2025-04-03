@@ -31,6 +31,7 @@ class InMemoryTaskManagerTest {
         taskManager = Managers.getDefault();
 
         epic = new Epic("Epic1", "Description Epic1");
+        epic.setId(1);
         subtask1 = new Subtask("Subtask1", "Description Subtask1", epic);
         subtask2 = new Subtask("Subtask1", "Description Subtask1", epic);
     }
@@ -67,6 +68,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testAddGetSubtask_ShouldAddAndReturnSubtask() {
+        taskManager.addEpic(epic);
         final int subtaskId = taskManager.addSubtask(subtask1);
         final Subtask savedSubtask = taskManager.getSubtask(subtaskId);
 
@@ -82,8 +84,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testAddTheSameTaskSubtaskEpic_ShouldNotAddTheSameTaskSubtaskEpic() {
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
 
         int duplicatedTaskId = taskManager.addTask(task); //should return -1
@@ -121,8 +123,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testRemoveSubtask_ShouldRemoveSubtask() {
-        taskManager.addSubtask(subtask1);
         taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
 
         taskManager.removeSubtask(subtask1.getId());
 
@@ -135,9 +137,9 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testGetAllSubtasksByEpic_ShouldReturnAllSubtasks() {
+        taskManager.addEpic(epic);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
-        taskManager.addEpic(epic);
 
         final List<Subtask> subtasks = taskManager.getAllSubtasksByEpic(epic);
 
@@ -160,9 +162,9 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testClearEpic_ShouldClearEpic() {
-        taskManager.addSubtask(subtask1);
         taskManager.addEpic(epic);
         taskManager.addEpic(new Epic("Epic2", "Description Epic2"));
+        taskManager.addSubtask(subtask1);
 
         taskManager.clearEpics();
 
@@ -175,9 +177,9 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testClearSubtask_ShouldClearSubtask() {
+        taskManager.addEpic(epic);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
-        taskManager.addEpic(epic);
 
         taskManager.clearSubtasks();
 
@@ -215,9 +217,9 @@ class InMemoryTaskManagerTest {
         String descriptionAfterUpdate = "Epic Description";
         TaskStatus taskStatusAfterUpdate = TaskStatus.DONE; //Принудительно не установится такой статус
 
+        taskManager.addEpic(epic);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
-        taskManager.addEpic(epic);
 
         subtask1.setStatus(TaskStatus.DONE);
 
@@ -236,6 +238,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testUpdateSubtask_ShouldUpdateSubtask() {
+        taskManager.addEpic(epic);
         taskManager.addSubtask(subtask1);
 
         String titleAfterUpdate = "Subtask Title";
@@ -257,8 +260,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testEpicStatusCheck_ShouldReturnCorrectEpicStatus() {
-        taskManager.addSubtask(subtask1);
         taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
 
         final TaskStatus epicNewWithoutSubtasks = taskManager.getEpic(epic.getId()).getStatus();
 
@@ -289,8 +292,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testAddTaskSubtaskEpicWithPresetId_ShouldNotReplaceExistingObjects() {
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
 
         Task presetIdTask = new Task("Title", "Description");
@@ -332,8 +335,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testGetHistory_ShouldReturnHistory() {
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
@@ -353,8 +356,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testRemoveTaskSubtaskEpic_ShouldRemoveTaskSubtaskEpicFromHistory() {
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
@@ -404,8 +407,8 @@ class InMemoryTaskManagerTest {
     void testClearTaskSubtaskEpic_ShouldRemoveAllTaskSubtaskEpicFromHistory() {
         Subtask subtask3 = new Subtask("Subtask3", "Description Subtask3", epic);
 
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
@@ -458,8 +461,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testSetDataInTaskSubtaskEpic_ShouldNotChangeTaskSubtaskEpicFromTaskManager() {
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 

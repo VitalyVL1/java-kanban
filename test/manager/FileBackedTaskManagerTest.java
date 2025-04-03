@@ -31,9 +31,13 @@ public class FileBackedTaskManagerTest {
 
         taskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file.getPath());
         task = new Task("Task1", "Description Task1");
+        task.setId(1);
         epic = new Epic("Epic1", "Description Epic1");
+        epic.setId(2);
         subtask1 = new Subtask("Subtask1", "Description Subtask1", epic);
+        subtask1.setId(3);
         subtask2 = new Subtask("Subtask2", "Description Subtask2", epic);
+        subtask2.setId(4);
     }
 
     @Test
@@ -51,8 +55,8 @@ public class FileBackedTaskManagerTest {
 
         assertTrue(equalTasks(task, actualTask), "Tasks не равны");
         assertTrue(equalTasks(epic, actualEpic), "Epics не равны");
-        assertTrue(equalTasks(subtask1, actualSubtask1) && equalTasks(subtask1.getEpic(), actualSubtask1.getEpic()), "Subtask1 не равны");
-        assertTrue(equalTasks(subtask2, actualSubtask2) && equalTasks(subtask2.getEpic(), actualSubtask2.getEpic()), "Subtask2 не равны");
+        assertTrue(equalTasks(subtask1, actualSubtask1) && (subtask1.getEpicId() == actualSubtask1.getEpicId()), "Subtask1 не равны");
+        assertTrue(equalTasks(subtask2, actualSubtask2) && (subtask2.getEpicId() == actualSubtask2.getEpicId()), "Subtask2 не равны");
 
         List<Subtask> actualSubtasksByEpic = loadedTaskManager.getAllSubtasksByEpic(epic);
         assertTrue(actualSubtasksByEpic.containsAll(List.of(subtask1, subtask2)), "Epic не содержит нужные Subtask");
@@ -96,8 +100,8 @@ public class FileBackedTaskManagerTest {
 
         assertTrue(equalTasks(task, actualTask), "Tasks не равны");
         assertTrue(equalTasks(epic, actualEpic), "Epics не равны");
-        assertTrue(equalTasks(subtask1, actualSubtask1) && equalTasks(subtask1.getEpic(), actualSubtask1.getEpic()), "Subtask1 не равны");
-        assertTrue(equalTasks(subtask2, actualSubtask2) && equalTasks(subtask2.getEpic(), actualSubtask2.getEpic()), "Subtask2 не равны");
+        assertTrue(equalTasks(subtask1, actualSubtask1) && (subtask1.getEpicId() == actualSubtask1.getEpicId()), "Subtask1 не равны");
+        assertTrue(equalTasks(subtask2, actualSubtask2) && (subtask2.getEpicId() == actualSubtask2.getEpicId()), "Subtask2 не равны");
 
         taskManager.clearTasks();
         taskManager.clearSubtasks();

@@ -14,6 +14,7 @@ class SubtaskTest {
     @BeforeAll
     static void setUpBeforeClass() {
         epic = new Epic("Epic1", "Description Epic1");
+        epic.setId(1);
     }
 
     @BeforeEach
@@ -22,10 +23,13 @@ class SubtaskTest {
                 epic);
         subtask2 = new Subtask("Subtask2", "Description Subtask2",
                 epic);
+        subtask1.setId(2);
+        subtask2.setId(3);
     }
 
     @Test
     void testGetEpic_ShouldReturnCorrectEpic() {
-        assertEquals(epic, subtask1.getEpic(), "Epic установленный в Subtask не равен полученному");
+        assertEquals(epic.getId(), subtask1.getEpicId(), "Epic установленный в Subtask1 не равен полученному");
+        assertEquals(epic.getId(), subtask2.getEpicId(), "Epic установленный в Subtask2 не равен полученному");
     }
 }

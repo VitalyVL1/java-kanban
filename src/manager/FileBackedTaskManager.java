@@ -26,7 +26,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task.getDescription()));
 
         if (task instanceof Subtask) {
-            sb.append(((Subtask) task).getEpic().getId());
+            sb.append(((Subtask) task).getEpicId());
         }
 
         return sb.toString();
@@ -167,7 +167,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         taskManager.addSubtask(new Subtask(id, title, description, status, type, new Epic("", "")));
                         epicIdBySubtaskId.put(id, epicId);
                     }
-                    case EPIC -> taskManager.addEpic(new Epic(id, title, description, status, type, new HashMap<>()));
+                    case EPIC -> taskManager.addEpic(new Epic(id, title, description, status, type, new HashSet<>()));
                 }
             }
 
@@ -305,15 +305,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        Path path = File.createTempFile("taskSave", ".txt").toPath();
+        TaskManager fileBackedManager = Managers.getFileBackedTaskManager(path.toString());
+
         task1 = new Task("First Task", "My first task");
         task2 = new Task("Second Task", "My second task");
         task3 = new Task("Third Task", "My third task");
 
+        fileBackedManager.addTask(task1);
+        fileBackedManager.addTask(task2);
 
         epic1 = new Epic("Fist Epic", "My first epic");
         epic2 = new Epic("Second Epic", "My second epic");
         epic3 = new Epic("Third Epic", "My third epic");
 
+        fileBackedManager.addEpic(epic1);
+        fileBackedManager.addEpic(epic2);
+        fileBackedManager.addEpic(epic3);
 
         subtask1 = new Subtask("Fist Subtask", "My first subtask", epic1);
         subtask2 = new Subtask("Second Subtask", "My second subtask", epic2);
@@ -321,21 +329,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         subtask4 = new Subtask("Fourth Subtask", "My fourth subtask", epic3);
         subtask5 = new Subtask("Fifth Subtask", "My fifth subtask", epic3);
 
-        Path path = File.createTempFile("taskSave", ".txt").toPath();
-        TaskManager fileBackedManager = Managers.getFileBackedTaskManager(path.toString());
-
-        fileBackedManager.addTask(task1);
-        fileBackedManager.addTask(task2);
-
         fileBackedManager.addSubtask(subtask1);
         fileBackedManager.addSubtask(subtask2);
         fileBackedManager.addSubtask(subtask3);
         fileBackedManager.addSubtask(subtask4);
         fileBackedManager.addSubtask(subtask5);
-
-        fileBackedManager.addEpic(epic1);
-        fileBackedManager.addEpic(epic2);
-        fileBackedManager.addEpic(epic3);
 
         task1 = fileBackedManager.getTask(task1.getId());
         task1.setStatus(TaskStatus.IN_PROGRESS);
@@ -417,11 +415,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println("restoredFileManager.getAllSubtasksByEpic(epic2) = " + restoredFileManager.getAllSubtasksByEpic(epic2));
         System.out.println("restoredFileManager.getAllSubtasksByEpic(epic3) = " + restoredFileManager.getAllSubtasksByEpic(epic3));
 
-        System.out.println("-".repeat(20));
-        System.out.println("-".repeat(20));
-
         fileBackedManager.clearTasks();
         fileBackedManager.clearEpics();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         restoredFileManager = FileBackedTaskManager.loadFromFile(path.toFile());
 

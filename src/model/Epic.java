@@ -1,52 +1,46 @@
 package model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Epic extends Task {
-    private Map<Integer, Subtask> subtasks;
+    private Set<Integer> subtasksId;
 
     public Epic(String title, String description) {
         super(title, description);
-        subtasks = new HashMap<>();
+        subtasksId = new HashSet<>();
         setType(TaskType.EPIC);
     }
 
     public Epic(Epic epic) {
         super(epic);
-        this.subtasks = epic.getSubtasks().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new Subtask(e.getValue())));
+        subtasksId = new HashSet<>(epic.subtasksId);
     }
 
-    public Epic(Task task, Map<Integer, Subtask> subtasks) {
+    public Epic(Task task, Set<Integer> subtasks) {
         super(task);
-        this.subtasks = subtasks;
+        this.subtasksId = subtasks;
     }
 
-    public Epic(Integer id, String title, String description, TaskStatus status, TaskType type, Map<Integer, Subtask> subtasks) {
+    public Epic(Integer id, String title, String description, TaskStatus status, TaskType type, Set<Integer> subtasks) {
         super(id, title, description, status, type);
-        this.subtasks = subtasks;
+        this.subtasksId = subtasks;
     }
 
     public void addOrUpdateSubtask(Subtask subtask) {
-        subtasks.put(subtask.getId(), subtask);
+        subtasksId.add(subtask.getId());
     }
 
-    public Map<Integer, Subtask> getSubtasks() {
-        return subtasks;
+    public Set<Integer> getSubtasksId() {
+        return subtasksId;
     }
 
-    public void setSubtasks(Map<Integer, Subtask> subtasks) {
-        this.subtasks = subtasks;
+    public void setSubtasks(Set<Integer> subtasksId) {
+        this.subtasksId = subtasksId;
     }
 
     public void removeSubtask(Subtask subtask) {
-        subtasks.remove(subtask.getId());
-    }
-
-    public Subtask getSubtaskById(int id) {
-        return subtasks.get(id);
+        subtasksId.remove(subtask.getId());
     }
 
     @Override
