@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,8 +56,8 @@ public class FileBackedTaskManagerTest {
 
         assertTrue(equalTasks(task, actualTask), "Tasks не равны");
         assertTrue(equalTasks(epic, actualEpic), "Epics не равны");
-        assertTrue(equalTasks(subtask1, actualSubtask1) && (subtask1.getEpicId() == actualSubtask1.getEpicId()), "Subtask1 не равны");
-        assertTrue(equalTasks(subtask2, actualSubtask2) && (subtask2.getEpicId() == actualSubtask2.getEpicId()), "Subtask2 не равны");
+        assertTrue(equalTasks(subtask1, actualSubtask1) && (Objects.equals(subtask1.getEpicId(), actualSubtask1.getEpicId())), "Subtask1 не равны");
+        assertTrue(equalTasks(subtask2, actualSubtask2) && (Objects.equals(subtask2.getEpicId(), actualSubtask2.getEpicId())), "Subtask2 не равны");
 
         List<Subtask> actualSubtasksByEpic = loadedTaskManager.getAllSubtasksByEpic(epic);
         assertTrue(actualSubtasksByEpic.containsAll(List.of(subtask1, subtask2)), "Epic не содержит нужные Subtask");
@@ -100,8 +101,8 @@ public class FileBackedTaskManagerTest {
 
         assertTrue(equalTasks(task, actualTask), "Tasks не равны");
         assertTrue(equalTasks(epic, actualEpic), "Epics не равны");
-        assertTrue(equalTasks(subtask1, actualSubtask1) && (subtask1.getEpicId() == actualSubtask1.getEpicId()), "Subtask1 не равны");
-        assertTrue(equalTasks(subtask2, actualSubtask2) && (subtask2.getEpicId() == actualSubtask2.getEpicId()), "Subtask2 не равны");
+        assertTrue(equalTasks(subtask1, actualSubtask1) && (Objects.equals(subtask1.getEpicId(), actualSubtask1.getEpicId())), "Subtask1 не равны");
+        assertTrue(equalTasks(subtask2, actualSubtask2) && (Objects.equals(subtask2.getEpicId(), actualSubtask2.getEpicId())), "Subtask2 не равны");
 
         taskManager.clearTasks();
         taskManager.clearSubtasks();
