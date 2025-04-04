@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,6 +22,8 @@ public class FileBackedTaskManagerTest {
     private static Epic epic;
     private static Subtask subtask1;
     private static Subtask subtask2;
+    private static LocalDateTime startTime;
+    private static Duration duration;
 
 
     @BeforeAll
@@ -30,14 +34,17 @@ public class FileBackedTaskManagerTest {
             System.out.println(e.getStackTrace());
         }
 
+        startTime = LocalDateTime.now();
+        duration = Duration.ofMinutes(15);
+
         taskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file.getPath());
-        task = new Task("Task1", "Description Task1");
+        task = new Task("Task1", "Description Task1", startTime.plusMinutes(10), duration.plusMinutes(10));
         task.setId(1);
         epic = new Epic("Epic1", "Description Epic1");
         epic.setId(2);
-        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic);
+        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic, startTime.minusHours(1), duration.plusMinutes(5));
         subtask1.setId(3);
-        subtask2 = new Subtask("Subtask2", "Description Subtask2", epic);
+        subtask2 = new Subtask("Subtask2", "Description Subtask2", epic, startTime.plusHours(1), duration.plusMinutes(20));
         subtask2.setId(4);
     }
 

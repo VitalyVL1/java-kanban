@@ -1,19 +1,31 @@
 package model;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
 
-    private static Task task1 = new Task("Task1", "Description Task1");
-    private static Task task2 = new Task("Task2", "Description Task2");
+    private static Task task1;
+    private static Task task2;
+    private static LocalDateTime startTime;
+    private static Duration duration;
+
+    @BeforeAll
+    static void setUpBeforeClass() {
+        startTime = LocalDateTime.now();
+        duration = Duration.ofMinutes(15);
+    }
 
     @BeforeEach
     void setUpBeforeEach() {
-        task1 = new Task("Task1", "Description Task1");
-        task2 = new Task("Task2", "Description Task2");
+        task1 = new Task("Task1", "Description Task1", startTime.plusMinutes(10), duration.plusMinutes(10));
+        task2 = new Task("Task2", "Description Task2", startTime.plusMinutes(30), duration.plusMinutes(5));
     }
 
     @Test
@@ -26,7 +38,7 @@ class TaskTest {
         assertEquals(task1, task2, "Tasks не равны друг другу");
 
         Epic epic = new Epic("Epic", "Description Epic");
-        Subtask subtask = new Subtask("Subtask", "Description Subtask", epic);
+        Subtask subtask = new Subtask("Subtask", "Description Subtask", epic, startTime.minusHours(1), duration.plusMinutes(5));
 
         epic.setId(1);
         subtask.setId(1);

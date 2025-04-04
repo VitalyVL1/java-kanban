@@ -3,9 +3,12 @@ package manager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,13 +20,21 @@ class InMemoryHistoryManagerTest {
     private static Task task;
     private static Epic epic;
     private static Subtask subtask;
+    private static LocalDateTime startTime;
+    private static Duration duration;
+
+    @BeforeAll
+    static void setUpBeforeClass() {
+        startTime = LocalDateTime.now();
+        duration = Duration.ofMinutes(15);
+    }
 
     @BeforeEach
     void setUp() {
         historyManager = Managers.getDefaultHistory();
-        task = new Task("Task1", "Description Task1");
+        task = new Task("Task1", "Description Task1", startTime.plusMinutes(10), duration.plusMinutes(10));
         epic = new Epic("Epic1", "Description Epic1");
-        subtask = new Subtask("Subtask1", "Description Subtask1", epic);
+        subtask = new Subtask("Subtask1", "Description Subtask1", epic, startTime.minusHours(1), duration.plusMinutes(5));
         task.setId(1);
         epic.setId(2);
         subtask.setId(3);

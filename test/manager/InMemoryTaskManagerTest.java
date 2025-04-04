@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +22,14 @@ class InMemoryTaskManagerTest {
     private static Epic epic;
     private static Subtask subtask1;
     private static Subtask subtask2;
+    private static LocalDateTime startTime;
+    private static Duration duration;
 
     @BeforeAll
     static void setUpBeforeClass() {
-        task = new Task("Task1", "Description Task1");
+        startTime = LocalDateTime.now();
+        duration = Duration.ofMinutes(15);
+        task = new Task("Task1", "Description Task1", startTime.plusMinutes(10), duration.plusMinutes(10));
     }
 
     @BeforeEach
@@ -32,8 +38,8 @@ class InMemoryTaskManagerTest {
 
         epic = new Epic("Epic1", "Description Epic1");
         epic.setId(1);
-        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic);
-        subtask2 = new Subtask("Subtask1", "Description Subtask1", epic);
+        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic, startTime.minusHours(1), duration.plusMinutes(5));
+        subtask2 = new Subtask("Subtask2", "Description Subtask2", epic, startTime.plusHours(1), duration.plusMinutes(20));
     }
 
     @Test
@@ -151,8 +157,8 @@ class InMemoryTaskManagerTest {
     @Test
     void testClearTask_ShouldClearTask() {
         taskManager.addTask(task);
-        taskManager.addTask(new Task("TaskTest", "Description TaskTest"));
-        taskManager.addTask(new Task("TaskTest", "Description TaskTest"));
+        taskManager.addTask(new Task("TaskTest", "Description TaskTest", startTime.plusMinutes(10), duration.plusMinutes(10)));
+        taskManager.addTask(new Task("TaskTest", "Description TaskTest", startTime.plusMinutes(10), duration.plusMinutes(10)));
 
         taskManager.clearTasks();
         final List<Task> tasks = taskManager.getTasks();
@@ -296,9 +302,9 @@ class InMemoryTaskManagerTest {
         taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
 
-        Task presetIdTask = new Task("Title", "Description");
+        Task presetIdTask = new Task("Title", "Description", startTime.plusMinutes(10), duration.plusMinutes(10));
         Epic presetIdEpic = new Epic("Title", "Description");
-        Subtask presetIdSubtask = new Subtask("Title", "Description", presetIdEpic);
+        Subtask presetIdSubtask = new Subtask("Title", "Description", presetIdEpic, startTime.minusHours(1), duration.plusMinutes(5));
 
         presetIdTask.setId(task.getId());
         presetIdEpic.setId(epic.getId());
@@ -320,9 +326,9 @@ class InMemoryTaskManagerTest {
         taskManager.addEpic(presetIdEpic);
         taskManager.addSubtask(presetIdSubtask);
 
-        taskManager.addTask(new Task("Title", "Description"));
+        taskManager.addTask(new Task("Title", "Description", startTime.plusMinutes(10), duration.plusMinutes(10)));
         taskManager.addEpic(new Epic("Title", "Description"));
-        taskManager.addSubtask(new Subtask("Title", "Description", epic));
+        taskManager.addSubtask(new Subtask("Title", "Description", epic, startTime.minusHours(1), duration.plusMinutes(5)));
 
         int taskSize = taskManager.getTasks().size();
         int epicSize = taskManager.getEpics().size();
@@ -405,7 +411,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void testClearTaskSubtaskEpic_ShouldRemoveAllTaskSubtaskEpicFromHistory() {
-        Subtask subtask3 = new Subtask("Subtask3", "Description Subtask3", epic);
+        Subtask subtask3 = new Subtask("Subtask3", "Description Subtask3", epic, startTime.minusHours(1), duration.plusMinutes(5));
 
         taskManager.addEpic(epic);
         taskManager.addTask(task);
