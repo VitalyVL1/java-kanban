@@ -1,13 +1,16 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Epic extends Task {
     private Set<Integer> subtasksId;
+    private LocalDateTime endTime;
 
     public Epic(String title, String description) {
-        super(title, description);
+        super(title, description, LocalDateTime.MIN, Duration.ZERO);
         subtasksId = new HashSet<>();
         setType(TaskType.EPIC);
     }
@@ -22,8 +25,8 @@ public class Epic extends Task {
         this.subtasksId = subtasks;
     }
 
-    public Epic(Integer id, String title, String description, TaskStatus status, TaskType type, Set<Integer> subtasks) {
-        super(id, title, description, status, type);
+    public Epic(Integer id, String title, String description, TaskStatus status, TaskType type, Set<Integer> subtasks, LocalDateTime startTime, Duration duration) {
+        super(id, title, description, status, type, startTime, duration);
         this.subtasksId = subtasks;
     }
 
@@ -44,13 +47,24 @@ public class Epic extends Task {
     }
 
     @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
     public String toString() {
         return "Epic{" +
                 "id=" + getId() +
-                ", type=" + getType() +
-                ", title=" + getTitle() +
-                ", description=" + getDescription() +
+                ", title='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
+                ", type=" + getType() +
+                ", duration=" + getDuration() +
+                ", startTime=" + getStartTime() +
                 '}';
     }
 }
