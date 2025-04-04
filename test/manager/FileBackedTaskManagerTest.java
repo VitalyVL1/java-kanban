@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,7 +36,7 @@ public class FileBackedTaskManagerTest {
             System.out.println(e.getStackTrace());
         }
 
-        startTime = LocalDateTime.now();
+        startTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli()), ZoneId.systemDefault());
         duration = Duration.ofMinutes(15);
 
         taskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file.getPath());
@@ -149,6 +151,8 @@ public class FileBackedTaskManagerTest {
         String expectedDescription = expectedTask.getDescription();
         TaskStatus expectedStatus = expectedTask.getStatus();
         TaskType expectedType = expectedTask.getType();
+        LocalDateTime expectedStartTime = expectedTask.getStartTime();
+        Duration expectedDuration = expectedTask.getDuration();
 
 
         int actualId = actualTask.getId() == null ? -1 : actualTask.getId();
@@ -156,11 +160,15 @@ public class FileBackedTaskManagerTest {
         String actualDescription = actualTask.getDescription();
         TaskStatus actualStatus = actualTask.getStatus();
         TaskType actualType = actualTask.getType();
+        LocalDateTime actualStartTime = actualTask.getStartTime();
+        Duration actualDuration = actualTask.getDuration();
 
         return expectedId == actualId &&
                 expectedTitle.equals(actualTitle) &&
                 expectedDescription.equals(actualDescription) &&
                 expectedStatus.equals(actualStatus) &&
-                expectedType.equals(actualType);
+                expectedType.equals(actualType) &&
+                expectedStartTime.equals(actualStartTime) &&
+                expectedDuration.equals(actualDuration);
     }
 }

@@ -30,7 +30,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         task.getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli(),
                 task.getDuration().toMillis()));
 
-
         if (task instanceof Subtask) {
             sb.append(((Subtask) task).getEpicId());
         }
