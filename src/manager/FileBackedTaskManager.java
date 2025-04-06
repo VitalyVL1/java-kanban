@@ -202,11 +202,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static void main(String[] args) throws IOException {
         TaskManager manager = Managers.getDefault();
         LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.ofMinutes(90);
+        Duration duration = Duration.ofMinutes(30);
 
-        Task task1 = new Task("First Task", "My first task", now, duration.plusMinutes(15));
-        Task task2 = new Task("Second Task", "My second task", now.plusHours(1), duration.plusMinutes(50));
-        Task task3 = new Task("Third Task", "My third task", now.plusHours(2), duration.plusMinutes(50));
+        Task task1 = new Task("First Task", "My first task", now, duration.plusMinutes(10));
+        Task task2 = new Task("Second Task", "My second task", now.plusHours(1), duration.plusMinutes(20));
+        Task task3 = new Task("Third Task", "My third task", now.plusHours(2), duration.plusMinutes(20));
         manager.addTask(task1);
         manager.addTask(task2);
         manager.addTask(task3);
@@ -220,9 +220,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         Subtask subtask1 = new Subtask("Fist Subtask", "My first subtask", epic1, now.minusHours(1), duration.plusMinutes(10));
         Subtask subtask2 = new Subtask("Second Subtask", "My second subtask", epic2, now.minusHours(2), duration.plusMinutes(20));
-        Subtask subtask3 = new Subtask("Third Subtask", "My third subtask", epic2, now.minusHours(3), duration.plusMinutes(30));
-        Subtask subtask4 = new Subtask("Fourth Subtask", "My fourth subtask", epic3, now.minusHours(4), duration.plusMinutes(40));
-        Subtask subtask5 = new Subtask("Fifth Subtask", "My fifth subtask", epic3, now.minusHours(5), duration.plusMinutes(50));
+        Subtask subtask3 = new Subtask("Third Subtask", "My third subtask", epic2, now.minusHours(3), duration.plusMinutes(20));
+        Subtask subtask4 = new Subtask("Fourth Subtask", "My fourth subtask", epic3, now.minusHours(4), duration.plusMinutes(25));
+        Subtask subtask5 = new Subtask("Fifth Subtask", "My fifth subtask", epic3, now.minusHours(5), duration.plusMinutes(15));
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
         manager.addSubtask(subtask3);
@@ -248,6 +248,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println("manager.getAllSubtasksByEpic(epic2) = " + manager.getAllSubtasksByEpic(epic2));
         System.out.println("manager.getAllSubtasksByEpic(epic3) = " + manager.getAllSubtasksByEpic(epic3));
         System.out.println("manager.getHistory() = " + manager.getHistory());
+        System.out.println("manager.getPrioritizedTasks() = " + manager.getPrioritizedTasks());
 
         task1.setStatus(TaskStatus.IN_PROGRESS);
         manager.updateTask(task1);
@@ -323,8 +324,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskManager fileBackedManager = Managers.getFileBackedTaskManager(path.toString());
 
         task1 = new Task("First Task", "My first task", now, duration.plusMinutes(15));
-        task2 = new Task("Second Task", "My second task", now.plusHours(1), duration.plusMinutes(50));
-        task3 = new Task("Third Task", "My third task", now.plusHours(2), duration.plusMinutes(50));
+        task2 = new Task("Second Task", "My second task", now.plusHours(1), duration.plusMinutes(10));
+        task3 = new Task("Third Task", "My third task", now.plusHours(2), duration.plusMinutes(20));
 
         fileBackedManager.addTask(task1);
         fileBackedManager.addTask(task2);
@@ -339,9 +340,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         subtask1 = new Subtask("Fist Subtask", "My first subtask", epic1, now.minusHours(1), duration.plusMinutes(10));
         subtask2 = new Subtask("Second Subtask", "My second subtask", epic2, now.minusHours(2), duration.plusMinutes(20));
-        subtask3 = new Subtask("Third Subtask", "My third subtask", epic2, now.minusHours(3), duration.plusMinutes(30));
-        subtask4 = new Subtask("Fourth Subtask", "My fourth subtask", epic3, now.minusHours(4), duration.plusMinutes(40));
-        subtask5 = new Subtask("Fifth Subtask", "My fifth subtask", epic3, now.minusHours(5), duration.plusMinutes(50));
+        subtask3 = new Subtask("Third Subtask", "My third subtask", epic2, now.minusHours(3), duration.plusMinutes(25));
+        subtask4 = new Subtask("Fourth Subtask", "My fourth subtask", epic3, now.minusHours(4), duration.plusMinutes(15));
+        subtask5 = new Subtask("Fifth Subtask", "My fifth subtask", epic3, now.minusHours(5), duration.plusMinutes(10));
 
         fileBackedManager.addSubtask(subtask1);
         fileBackedManager.addSubtask(subtask2);

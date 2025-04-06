@@ -32,9 +32,9 @@ class InMemoryHistoryManagerTest {
     @BeforeEach
     void setUp() {
         historyManager = Managers.getDefaultHistory();
-        task = new Task("Task1", "Description Task1", startTime.plusMinutes(10), duration.plusMinutes(10));
+        task = new Task("Task1", "Description Task1", startTime.plusHours(1), duration.plusMinutes(10));
         epic = new Epic("Epic1", "Description Epic1");
-        subtask = new Subtask("Subtask1", "Description Subtask1", epic, startTime.minusHours(1), duration.plusMinutes(5));
+        subtask = new Subtask("Subtask1", "Description Subtask1", epic, startTime.plusHours(2), duration.plusMinutes(5));
         task.setId(1);
         epic.setId(2);
         subtask.setId(3);

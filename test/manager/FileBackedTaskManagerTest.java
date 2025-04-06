@@ -40,13 +40,13 @@ public class FileBackedTaskManagerTest {
         duration = Duration.ofMinutes(15);
 
         taskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file.getPath());
-        task = new Task("Task1", "Description Task1", startTime.plusMinutes(10), duration.plusMinutes(10));
+        task = new Task("Task1", "Description Task1", startTime.plusHours(1), duration.plusMinutes(10));
         task.setId(1);
         epic = new Epic("Epic1", "Description Epic1");
         epic.setId(2);
-        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic, startTime.minusHours(1), duration.plusMinutes(5));
+        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic, startTime.plusHours(2), duration.plusMinutes(5));
         subtask1.setId(3);
-        subtask2 = new Subtask("Subtask2", "Description Subtask2", epic, startTime.plusHours(1), duration.plusMinutes(20));
+        subtask2 = new Subtask("Subtask2", "Description Subtask2", epic, startTime.plusHours(3), duration.plusMinutes(20));
         subtask2.setId(4);
     }
 
@@ -87,7 +87,6 @@ public class FileBackedTaskManagerTest {
 
         taskManager.addTask(task);
         taskManager.addEpic(epic);
-        taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
         task.setTitle("Test Title");
