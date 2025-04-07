@@ -6,54 +6,34 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
-    private static TaskManager taskManager;
     private static File file;
-    private static Task task;
-    private static Epic epic;
-    private static Subtask subtask1;
-    private static Subtask subtask2;
-    private static LocalDateTime startTime;
-    private static Duration duration;
 
+    @Override
+    protected TaskManager init() {
+        return Managers.getFileBackedTaskManager(file.getAbsolutePath());
+    }
 
     @BeforeAll
-    static void setUpBeforeClass() {
+    static void setUpBeforeInit() {
         try {
             file = File.createTempFile("test", ".txt");
         } catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
-
-        startTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli()), ZoneId.systemDefault());
-        duration = Duration.ofMinutes(15);
-
-        taskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file.getPath());
-        task = new Task("Task1", "Description Task1", startTime.plusHours(1), duration.plusMinutes(10));
-        task.setId(1);
-        epic = new Epic("Epic1", "Description Epic1");
-        epic.setId(2);
-        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic, startTime.plusHours(2), duration.plusMinutes(5));
-        subtask1.setId(3);
-        subtask2 = new Subtask("Subtask2", "Description Subtask2", epic, startTime.plusHours(3), duration.plusMinutes(20));
-        subtask2.setId(4);
     }
 
     @Test
     void testSaveAndLoadTask_ShouldSaveTaskToFileAndLoadFromIt() {
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
@@ -132,42 +112,4 @@ public class FileBackedTaskManagerTest {
         assertEquals(0, tempTaskManager.getSubtasks().size(), "Subtask должен быть пустым");
     }
 
-    private static boolean equalTasks(Task expectedTask, Task actualTask) {
-        if (expectedTask == null && actualTask == null) {
-            return true;
-        }
-
-        if ((expectedTask == null && actualTask != null) || (expectedTask != null && actualTask == null)) {
-            return false;
-        }
-
-        if (!expectedTask.getClass().equals(actualTask.getClass())) {
-            return false;
-        }
-
-        int expectedId = expectedTask.getId() == null ? -1 : expectedTask.getId();
-        String expectedTitle = expectedTask.getTitle();
-        String expectedDescription = expectedTask.getDescription();
-        TaskStatus expectedStatus = expectedTask.getStatus();
-        TaskType expectedType = expectedTask.getType();
-        LocalDateTime expectedStartTime = expectedTask.getStartTime();
-        Duration expectedDuration = expectedTask.getDuration();
-
-
-        int actualId = actualTask.getId() == null ? -1 : actualTask.getId();
-        String actualTitle = actualTask.getTitle();
-        String actualDescription = actualTask.getDescription();
-        TaskStatus actualStatus = actualTask.getStatus();
-        TaskType actualType = actualTask.getType();
-        LocalDateTime actualStartTime = actualTask.getStartTime();
-        Duration actualDuration = actualTask.getDuration();
-
-        return expectedId == actualId &&
-                expectedTitle.equals(actualTitle) &&
-                expectedDescription.equals(actualDescription) &&
-                expectedStatus.equals(actualStatus) &&
-                expectedType.equals(actualType) &&
-                expectedStartTime.equals(actualStartTime) &&
-                expectedDuration.equals(actualDuration);
-    }
 }
