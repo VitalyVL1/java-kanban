@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-abstract class TaskManagerTest<T extends TaskManager>{
+abstract class TaskManagerTest<T extends TaskManager> {
 
     protected abstract TaskManager init();
 
