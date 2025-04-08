@@ -67,6 +67,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
         taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
         task.setTitle("Test Title");

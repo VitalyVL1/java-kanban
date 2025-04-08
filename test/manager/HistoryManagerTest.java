@@ -159,6 +159,6 @@ public abstract class HistoryManagerTest {
     @Test
     void testGetEmptyHistory_ShouldReturnEmptyList() {
         List<Task> history = historyManager.getHistory();
-        assertTrue(history.isEmpty(),"Неверное выводится пустая история");
+        assertTrue(history.isEmpty(), "Неверное выводится пустая история");
     }
 }

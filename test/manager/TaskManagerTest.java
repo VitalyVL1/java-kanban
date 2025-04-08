@@ -1,5 +1,6 @@
 package manager;
 
+import exception.TaskOverlappingException;
 import model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -607,6 +608,86 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(correctStartTime, startTimeAfterAddSubtask, "Не верно рассчитано StartTime у Epic");
         assertEquals(correctEndTime, endTimeAfterAddSubtask, "Не верно рассчитана Duration у Epic");
         assertEquals(correctDuration, durationAfterAddSubtask, "Не верно рассчитано EndTime Epic");
+    }
+
+    @Test
+    void testAddOverlappingTask_ShouldThrowException() {
+        taskManager.addTask(task);
+        Task copyOfTask = new Task(task);
+        copyOfTask.setId(11);
+
+        assertThrows(TaskOverlappingException.class, () -> taskManager.addTask(copyOfTask), "Exception не выбросился при добавлении пересекающейся задачи");
+    }
+
+    @Test
+    void testAddOverlappingSubTask_ShouldThrowException() {
+        taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
+        Subtask copyOfSubtask = new Subtask(subtask1);
+        copyOfSubtask.setId(11);
+
+        assertThrows(TaskOverlappingException.class, () -> taskManager.addTask(copyOfSubtask), "Exception не выбросился при добавлении пересекающейся подзадачи");
+    }
+
+    @Test
+    void testUpdateOverlappingTask_ShouldThrowException() {
+        taskManager.addEpic(epic);
+        int taskId = taskManager.addTask(task);
+        int subtaskId = taskManager.addSubtask(subtask1);
+
+        LocalDateTime overlappingStartTime = taskManager.getSubtask(subtaskId).getStartTime();
+
+        Task taskToUpdate = taskManager.getTask(taskId);
+        taskToUpdate.setStartTime(overlappingStartTime);
+
+        assertThrows(TaskOverlappingException.class, () -> taskManager.updateTask(taskToUpdate), "Exception не выбросился при добавлении пересекающейся задачи");
+    }
+
+    @Test
+    void testUpdateOverlappingSubTask_ShouldThrowException() {
+        taskManager.addEpic(epic);
+        int taskId = taskManager.addTask(task);
+        int subtaskId = taskManager.addSubtask(subtask1);
+
+        LocalDateTime overlappingStartTime = taskManager.getTask(taskId).getStartTime();
+
+        Subtask subtaskToUpdate = taskManager.getSubtask(subtaskId);
+        subtaskToUpdate.setStartTime(overlappingStartTime);
+
+        assertThrows(TaskOverlappingException.class, () -> taskManager.updateSubtask(subtaskToUpdate), "Exception не выбросился при добавлении пересекающейся задачи");
+    }
+
+    @Test
+    void testUpdateTaskSubtaskWithDeletingStartTime_ShouldDeleteTaskSubtaskFromPrioritizedList() {
+        taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+
+        Subtask subtask1ToUpdate = taskManager.getSubtask(subtask1.getId());
+        Subtask subtask2ToUpdate = taskManager.getSubtask(subtask2.getId());
+
+        subtask1ToUpdate.setStartTime(LocalDateTime.MIN);
+        subtask1ToUpdate.setDuration(Duration.ZERO);
+
+        taskManager.updateSubtask(subtask1ToUpdate);
+
+        final List<Task> prioritizedListAfterUpdatingSubtask1 = taskManager.getPrioritizedTasks();
+
+        assertEquals(subtask2ToUpdate.getStartTime(), taskManager.getEpic(epic.getId()).getStartTime(), "StartTime Epic не пересчиталось");
+        assertEquals(subtask2ToUpdate.getDuration(), taskManager.getEpic(epic.getId()).getDuration(), "Duration Epic не пересчиталась");
+
+        subtask2ToUpdate.setStartTime(LocalDateTime.MIN);
+        subtask2ToUpdate.setDuration(Duration.ZERO);
+
+        taskManager.updateSubtask(subtask2ToUpdate);
+
+        final List<Task> prioritizedListAfterUpdatingSubtask2 = taskManager.getPrioritizedTasks();
+
+        assertEquals(LocalDateTime.MIN, taskManager.getEpic(epic.getId()).getStartTime(), "StartTime Epic не пересчиталось");
+        assertEquals(Duration.ZERO, taskManager.getEpic(epic.getId()).getDuration(), "Duration Epic не пересчиталась");
+
+        assertEquals(1, prioritizedListAfterUpdatingSubtask1.size(), "Subtask1 не удален из приоритизированного списка");
+        assertEquals(0, prioritizedListAfterUpdatingSubtask2.size(), "Subtask2 не удален из приоритизированного списка");
     }
 
     protected static boolean equalTasks(Task expectedTask, Task actualTask) {

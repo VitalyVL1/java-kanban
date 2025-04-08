@@ -1,5 +1,6 @@
 package manager;
 
+import exception.TaskOverlappingException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -19,7 +20,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final Set<Task> prioritizedTasks = new TreeSet<>();
+    private final Set<Task> prioritizedTasks = new TreeSet<>(TASK_COMPARATOR);
+    public final static Comparator<Task> TASK_COMPARATOR = Comparator.comparing(Task::getStartTime);
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         taskId = 1;
@@ -64,13 +66,16 @@ public class InMemoryTaskManager implements TaskManager {
                 int id = generateId();
                 task.setId(id);
             }
-            if (isValidDateTime(task) && !isOverlapping(task)) {
+
+            if (!isValidDateTime(task)) {
+                tasks.put(task.getId(), task);
+                taskIds.add(task.getId());
+            } else if (!isOverlapping(task)) {
                 tasks.put(task.getId(), task);
                 taskIds.add(task.getId());
                 prioritizedTasks.add(task);
             } else {
-                System.out.println("Задача пересекается по времени или время не задано");
-                return -2;
+                throw new TaskOverlappingException("Указанное время задач пересекается с другими задачами или задано некорректно");
             }
 
             return task.getId();
@@ -87,13 +92,15 @@ public class InMemoryTaskManager implements TaskManager {
                 subtask.setId(id);
             }
 
-            if (isValidDateTime(subtask) && !isOverlapping(subtask)) {
+            if (!isValidDateTime(subtask)) {
+                subtasks.put(subtask.getId(), subtask);
+                taskIds.add(subtask.getId());
+            } else if (!isOverlapping(subtask)) {
                 subtasks.put(subtask.getId(), subtask);
                 taskIds.add(subtask.getId());
                 prioritizedTasks.add(subtask);
             } else {
-                System.out.println("Задача пересекается по времени или время не задано");
-                return -2;
+                throw new TaskOverlappingException("Указанное время задач пересекается с другими задачами или задано некорректно");
             }
 
             Integer epicId = subtask.getEpicId();
@@ -120,6 +127,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getSubtasksId().forEach(
                 subtaskId -> {
                     historyManager.remove(subtaskId);
+                    prioritizedTasks.remove(subtasks.get(subtaskId));
                     subtasks.remove(subtaskId);
                     taskIds.remove(subtaskId);
                 });
@@ -217,12 +225,43 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
-        tasks.put(task.getId(), task);
+        Task taskBeforeUpdate = tasks.get(task.getId());
+        boolean isInPrioritizedList = prioritizedTasks.contains(taskBeforeUpdate);
+
+        if (isInPrioritizedList) {
+            prioritizedTasks.remove(taskBeforeUpdate);
+        }
+
+        if (!isValidDateTime(task)) {
+            tasks.put(task.getId(), task);
+        } else if (!isOverlapping(task)) {
+            tasks.put(task.getId(), task);
+            prioritizedTasks.add(task);
+        } else {
+            prioritizedTasks.add(taskBeforeUpdate);
+            throw new TaskOverlappingException("Указанное время задач пересекается с другими задачами или задано некорректно");
+        }
     }
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        subtasks.put(subtask.getId(), subtask);
+        Subtask subtaskBeforeUpdate = subtasks.get(subtask.getId());
+        boolean isInPrioritizedList = prioritizedTasks.contains(subtaskBeforeUpdate);
+
+        if (isInPrioritizedList) {
+            prioritizedTasks.remove(subtaskBeforeUpdate);
+        }
+
+        if (!isValidDateTime(subtask)) {
+            subtasks.put(subtask.getId(), subtask);
+        } else if (!isOverlapping(subtask)) {
+            subtasks.put(subtask.getId(), subtask);
+            prioritizedTasks.add(subtask);
+        } else {
+            prioritizedTasks.add(subtaskBeforeUpdate);
+            throw new TaskOverlappingException("Указанное время задач пересекается с другими задачами или задано некорректно");
+        }
+
         checkEpicStatus(epics.get(subtask.getEpicId()));
         calculateTimeAndDurationOfEpic(epics.get(subtask.getEpicId()));
     }
@@ -312,11 +351,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void calculateTimeAndDurationOfEpic(Epic epic) {
-        List<Subtask> subtaskList = getAllSubtasksByEpic(epic);
+        List<Subtask> subtaskList = prioritizedTasks.stream()
+                .filter(t -> epic.getSubtasksId().contains(t.getId()))
+                .map(s -> (Subtask) s)
+                .toList();
 
         if (!subtaskList.isEmpty()) {
             LocalDateTime startTime = subtaskList.stream()
-                    .min(Task::compareTo).get().getStartTime();
+                    .min(TASK_COMPARATOR).get().getStartTime();
 
             Duration duration = subtaskList.stream()
                     .map(Subtask::getDuration)
