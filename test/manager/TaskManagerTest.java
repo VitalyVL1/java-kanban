@@ -573,7 +573,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         sortedByStartTimeTask.addAll(taskManager.getSubtasks());
         sortedByStartTimeTask.addAll(taskManager.getTasks());
 
-        sortedByStartTimeTask.sort(Comparator.comparing(t -> t.getStartTime()));
+        sortedByStartTimeTask.sort(Comparator.comparing(Task::getStartTime));
 
         final Task[] sortedByStartTimeTaskArray = sortedByStartTimeTask.toArray(Task[]::new);
 

@@ -384,7 +384,7 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime endTimeTask = task.getEndTime();
 
         Map<LocalDateTime, LocalDateTime> startToEndTimeMap = prioritizedTasks.stream()
-                .collect(Collectors.toMap(key -> key.getStartTime(), value -> value.getEndTime()));
+                .collect(Collectors.toMap(Task::getStartTime, Task::getEndTime));
 
         for (Map.Entry<LocalDateTime, LocalDateTime> entry : startToEndTimeMap.entrySet()) {
             boolean notOverlap = entry.getKey().isAfter(endTimeTask) || entry.getValue().isBefore(startTimeTask);
@@ -397,9 +397,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private static boolean isValidDateTime(Task task) {
-        if (task.getStartTime() == null || task.getStartTime() == LocalDateTime.MIN) {
-            return false;
-        }
-        return true;
+        return task.getStartTime() != null && task.getStartTime() != LocalDateTime.MIN;
     }
 }

@@ -18,6 +18,7 @@ public class Epic extends Task {
     public Epic(Epic epic) {
         super(epic);
         subtasksId = new HashSet<>(epic.subtasksId);
+        endTime = epic.endTime;
     }
 
     public Epic(Integer id, String title, String description, TaskStatus status, TaskType type, Set<Integer> subtasks, LocalDateTime startTime, Duration duration) {
