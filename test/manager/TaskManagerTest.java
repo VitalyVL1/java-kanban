@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -204,24 +205,33 @@ abstract class TaskManagerTest<T extends TaskManager> {
         String titleAfterUpdate = "Task Title";
         String descriptionAfterUpdate = "Task Description";
         TaskStatus taskStatusAfterUpdate = TaskStatus.IN_PROGRESS;
+        LocalDateTime startDateTimeAfterUpdate = startTime.plusHours(10);
+        Duration durationAfterUpdate = duration.plusMinutes(12);
 
         task.setTitle(titleAfterUpdate);
         task.setDescription(descriptionAfterUpdate);
         task.setStatus(taskStatusAfterUpdate);
+        task.setStartTime(startDateTimeAfterUpdate);
+        task.setDuration(durationAfterUpdate);
 
         taskManager.updateTask(task);
 
         Task taskAfterUpdate = taskManager.getTask(task.getId());
 
-        assertEquals(titleAfterUpdate, taskAfterUpdate.getTitle(), "Title не обновился");
-        assertEquals(descriptionAfterUpdate, taskAfterUpdate.getDescription(), "Description не обновилось");
-        assertEquals(taskStatusAfterUpdate, taskAfterUpdate.getStatus(), "Status не обновился");
+        assertEquals(titleAfterUpdate, taskAfterUpdate.getTitle(), "Task Title не обновился");
+        assertEquals(descriptionAfterUpdate, taskAfterUpdate.getDescription(), "Task Description не обновилось");
+        assertEquals(taskStatusAfterUpdate, taskAfterUpdate.getStatus(), "Task Status не обновился");
+        assertEquals(startDateTimeAfterUpdate, taskAfterUpdate.getStartTime(), "Task StartTime не обновилось");
+        assertEquals(durationAfterUpdate, taskAfterUpdate.getDuration(), "Task Duration не обновилась");
     }
 
     @Test
     void testUpdateEpic_ShouldUpdateEpic() {
         String titleAfterUpdate = "Epic Title";
         String descriptionAfterUpdate = "Epic Description";
+        LocalDateTime startDateTimeAfterUpdate = startTime.plusHours(10);
+        Duration durationAfterUpdate = duration.plusMinutes(12);
+
         TaskStatus taskStatusAfterUpdate = TaskStatus.DONE; //Принудительно не установится такой статус
 
         taskManager.addEpic(epic);
@@ -233,14 +243,22 @@ abstract class TaskManagerTest<T extends TaskManager> {
         epic.setTitle(titleAfterUpdate);
         epic.setDescription(descriptionAfterUpdate);
         epic.setStatus(taskStatusAfterUpdate);
+        epic.setStartTime(startDateTimeAfterUpdate);
+        epic.setDuration(durationAfterUpdate);
 
         taskManager.updateEpic(epic);
 
+        LocalDateTime correctEpicStartDateTimeAfterUpdate = subtask1.getStartTime().isBefore(subtask2.getStartTime()) ?
+                subtask1.getStartTime() : subtask2.getStartTime();
+        Duration correctDurationAfterUpdate = subtask1.getDuration().plus(subtask2.getDuration());
+
         Epic epicAfterUpdate = taskManager.getEpic(epic.getId());
 
-        assertEquals(titleAfterUpdate, epicAfterUpdate.getTitle(), "Title не обновился");
-        assertEquals(descriptionAfterUpdate, epicAfterUpdate.getDescription(), "Description не обновилось");
-        assertEquals(TaskStatus.IN_PROGRESS, epicAfterUpdate.getStatus(), "Status обновился некорректно");
+        assertEquals(titleAfterUpdate, epicAfterUpdate.getTitle(), "Epic Title не обновился");
+        assertEquals(descriptionAfterUpdate, epicAfterUpdate.getDescription(), "Epic Description не обновилось");
+        assertEquals(TaskStatus.IN_PROGRESS, epicAfterUpdate.getStatus(), "Epic Status обновился некорректно");
+        assertEquals(correctEpicStartDateTimeAfterUpdate, epicAfterUpdate.getStartTime(), "Epic StartTime обновилось некорректно");
+        assertEquals(correctDurationAfterUpdate, epicAfterUpdate.getDuration(), "Epic Duration обновилось некорректно");
     }
 
     @Test
@@ -251,36 +269,63 @@ abstract class TaskManagerTest<T extends TaskManager> {
         String titleAfterUpdate = "Subtask Title";
         String descriptionAfterUpdate = "Subtask Description";
         TaskStatus taskStatusAfterUpdate = TaskStatus.DONE;
+        LocalDateTime startDateTimeAfterUpdate = startTime.plusHours(10);
+        Duration durationAfterUpdate = duration.plusMinutes(12);
 
         subtask1.setTitle(titleAfterUpdate);
         subtask1.setDescription(descriptionAfterUpdate);
         subtask1.setStatus(taskStatusAfterUpdate);
+        subtask1.setStartTime(startDateTimeAfterUpdate);
+        subtask1.setDuration(durationAfterUpdate);
 
         taskManager.updateSubtask(subtask1);
 
         Subtask subtaskAfterUpdate = taskManager.getSubtask(subtask1.getId());
 
-        assertEquals(titleAfterUpdate, subtaskAfterUpdate.getTitle(), "Title не обновился");
-        assertEquals(descriptionAfterUpdate, subtaskAfterUpdate.getDescription(), "Description не обновилось");
-        assertEquals(taskStatusAfterUpdate, subtaskAfterUpdate.getStatus(), "Status не обновился");
+        assertEquals(titleAfterUpdate, subtaskAfterUpdate.getTitle(), "Subtask Title не обновился");
+        assertEquals(descriptionAfterUpdate, subtaskAfterUpdate.getDescription(), "Subtask Description не обновилось");
+        assertEquals(taskStatusAfterUpdate, subtaskAfterUpdate.getStatus(), "Subtask Status не обновился");
+        assertEquals(startDateTimeAfterUpdate, subtaskAfterUpdate.getStartTime(), "Subtask StartTime не обновилось");
+        assertEquals(durationAfterUpdate, subtaskAfterUpdate.getDuration(), "Subtask Duration не обновилась");
     }
 
     @Test
     void testEpicStatusCheck_ShouldReturnCorrectEpicStatus() {
         taskManager.addEpic(epic);
-        taskManager.addSubtask(subtask1);
 
         final TaskStatus epicNewWithoutSubtasks = taskManager.getEpic(epic.getId()).getStatus();
+
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+
+        final TaskStatus epicNewWithAllNewSubtasks = taskManager.getEpic(epic.getId()).getStatus();
+
+        subtask1.setStatus(TaskStatus.DONE);
+        subtask2.setStatus(TaskStatus.DONE);
+
+        taskManager.updateSubtask(subtask1);
+        taskManager.updateSubtask(subtask2);
+
+        final TaskStatus epicDoneAllSubtasksDone = taskManager.getEpic(epic.getId()).getStatus();
+
+        subtask1.setStatus(TaskStatus.NEW);
+        taskManager.updateSubtask(subtask1);
+
+        final TaskStatus epicInProgressWithDoneAndNewSubtask = taskManager.getEpic(epic.getId()).getStatus();
+
+        subtask1.setStatus(TaskStatus.IN_PROGRESS);
+        subtask2.setStatus(TaskStatus.IN_PROGRESS);
+
+        taskManager.updateSubtask(subtask1);
+        taskManager.updateSubtask(subtask2);
+
+        final TaskStatus epicInProgressWithAllInProgressSubtasks = taskManager.getEpic(epic.getId()).getStatus();
 
         subtask1.setStatus(TaskStatus.DONE);
 
         taskManager.updateSubtask(subtask1);
 
-        final TaskStatus epicDoneAllSubtasksDone = taskManager.getEpic(epic.getId()).getStatus();
-
-        taskManager.addSubtask(subtask2);
-
-        final TaskStatus epicInProgress = taskManager.getEpic(epic.getId()).getStatus();
+        final TaskStatus epicInProgressWithDoneAndInProgressSubtasks = taskManager.getEpic(epic.getId()).getStatus();
 
         taskManager.removeSubtask(subtask2.getId());
 
@@ -291,8 +336,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
         final TaskStatus epicNewAfterClearSubtask = taskManager.getEpic(epic.getId()).getStatus();
 
         assertEquals(TaskStatus.NEW, epicNewWithoutSubtasks, "Не верный статус Эпика без Subtask");
+        assertEquals(TaskStatus.NEW, epicNewWithAllNewSubtasks, "Не верный статус Эпика с NEW Subtasks");
         assertEquals(TaskStatus.DONE, epicDoneAllSubtasksDone, "Не верный статус Эпика с Subtasks DONE");
-        assertEquals(TaskStatus.IN_PROGRESS, epicInProgress, "Не верный статус Эпика со смешанным статусом Subtask");
+        assertEquals(TaskStatus.IN_PROGRESS, epicInProgressWithDoneAndNewSubtask, "Не верный статус Эпика с DONE, NEW Subtask");
+        assertEquals(TaskStatus.IN_PROGRESS, epicInProgressWithAllInProgressSubtasks, "Не верный статус Эпика с IN_PROGRESS Subtask");
+        assertEquals(TaskStatus.IN_PROGRESS, epicInProgressWithDoneAndInProgressSubtasks, "Не верный статус Эпика с DONE, IN_PROGRESS Subtask");
         assertEquals(TaskStatus.DONE, epicDoneAfterRemoveSubtask, "Не верный статус Эпика после удаления Subtask");
         assertEquals(TaskStatus.NEW, epicNewAfterClearSubtask, "Не верный статус Эпика после удаления всех Subtask");
     }
@@ -510,6 +558,55 @@ abstract class TaskManagerTest<T extends TaskManager> {
             assertNotEquals("CHECK_ALL", t.getTitle(), t.getClass()
                     + " попали изменения getAll object с помощью setter'ов");
         }
+    }
+
+    @Test
+    void testGetPrioritizedTasks() {
+        taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+        taskManager.addTask(task);
+
+        final Task[] prioritizedTasksArray = taskManager.getPrioritizedTasks().toArray(Task[]::new);
+        final List<Task> sortedByStartTimeTask = new ArrayList<>();
+        sortedByStartTimeTask.addAll(taskManager.getSubtasks());
+        sortedByStartTimeTask.addAll(taskManager.getTasks());
+
+        sortedByStartTimeTask.sort(Comparator.comparing(t -> t.getStartTime()));
+
+        final Task[] sortedByStartTimeTaskArray = sortedByStartTimeTask.toArray(Task[]::new);
+
+        assertArrayEquals(prioritizedTasksArray, sortedByStartTimeTaskArray, "Не правильно сформирован приоритизированный список задач");
+    }
+
+    @Test
+    void epicStartTimeAndDurationTest_ShouldReturnCalculatedStartTimeAndDuration() {
+        taskManager.addEpic(epic);
+
+        final LocalDateTime startTimeBeforeAddSubtask = epic.getStartTime(); // LocalDateTime.MIN
+        final LocalDateTime endTimeBeforeAddSubtask = epic.getEndTime(); // null
+        final Duration durationBeforeAddSubtask = epic.getDuration(); // Duration.ZERO
+
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+
+        final LocalDateTime startTimeAfterAddSubtask = epic.getStartTime();
+        final LocalDateTime endTimeAfterAddSubtask = epic.getEndTime();
+        final Duration durationAfterAddSubtask = epic.getDuration();
+
+        final LocalDateTime correctStartTime = subtask1.getStartTime().isBefore(subtask2.getStartTime()) ?
+                subtask1.getStartTime() : subtask2.getStartTime();
+        final LocalDateTime correctEndTime = subtask1.getEndTime().isAfter(subtask2.getEndTime()) ?
+                subtask1.getEndTime() : subtask2.getEndTime();
+        final Duration correctDuration = subtask1.getDuration().plus(subtask2.getDuration());
+
+        assertEquals(LocalDateTime.MIN, startTimeBeforeAddSubtask, "Не верно установлено StartTime у нового Epic");
+        assertNull(endTimeBeforeAddSubtask, "Не верное EndTime у нового Epic");
+        assertEquals(Duration.ZERO, durationBeforeAddSubtask, "Не верно установлена Duration у нового Epic");
+
+        assertEquals(correctStartTime, startTimeAfterAddSubtask, "Не верно рассчитано StartTime у Epic");
+        assertEquals(correctEndTime, endTimeAfterAddSubtask, "Не верно рассчитана Duration у Epic");
+        assertEquals(correctDuration, durationAfterAddSubtask, "Не верно рассчитано EndTime Epic");
     }
 
     protected static boolean equalTasks(Task expectedTask, Task actualTask) {

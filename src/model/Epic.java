@@ -20,11 +20,6 @@ public class Epic extends Task {
         subtasksId = new HashSet<>(epic.subtasksId);
     }
 
-    public Epic(Task task, Set<Integer> subtasks) {
-        super(task);
-        this.subtasksId = subtasks;
-    }
-
     public Epic(Integer id, String title, String description, TaskStatus status, TaskType type, Set<Integer> subtasks, LocalDateTime startTime, Duration duration) {
         super(id, title, description, status, type, startTime, duration);
         this.subtasksId = subtasks;
