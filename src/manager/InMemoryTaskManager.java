@@ -20,8 +20,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final Set<Task> prioritizedTasks = new TreeSet<>(TASK_COMPARATOR);
-    public final static Comparator<Task> TASK_COMPARATOR = Comparator.comparing(Task::getStartTime);
+    private final Comparator<Task> taskComparator = Comparator.comparing(Task::getStartTime);
+    private final Set<Task> prioritizedTasks = new TreeSet<>(taskComparator);
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         taskId = 1;
@@ -358,7 +358,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (!subtaskList.isEmpty()) {
             LocalDateTime startTime = subtaskList.stream()
-                    .min(TASK_COMPARATOR).get().getStartTime();
+                    .min(taskComparator).get().getStartTime();
 
             Duration duration = subtaskList.stream()
                     .map(Subtask::getDuration)
