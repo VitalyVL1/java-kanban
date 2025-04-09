@@ -30,17 +30,23 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Epic> getEpics() {
-        return epics.values().stream().map(Epic::new).toList();
+        return epics.values().stream()
+                .map(Epic::new)
+                .toList();
     }
 
     @Override
     public List<Task> getTasks() {
-        return tasks.values().stream().map(Task::new).toList();
+        return tasks.values().stream()
+                .map(Task::new)
+                .toList();
     }
 
     @Override
     public List<Subtask> getSubtasks() {
-        return subtasks.values().stream().map(Subtask::new).toList();
+        return subtasks.values().stream()
+                .map(Subtask::new)
+                .toList();
     }
 
     @Override
@@ -67,7 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
                 task.setId(id);
             }
 
-            if (!isValidDateTime(task)) {
+            if (isInvalidDateTime(task)) {
                 tasks.put(task.getId(), task);
                 taskIds.add(task.getId());
             } else if (!isOverlapping(task)) {
@@ -92,7 +98,7 @@ public class InMemoryTaskManager implements TaskManager {
                 subtask.setId(id);
             }
 
-            if (!isValidDateTime(subtask)) {
+            if (isInvalidDateTime(subtask)) {
                 subtasks.put(subtask.getId(), subtask);
                 taskIds.add(subtask.getId());
             } else if (!isOverlapping(subtask)) {
@@ -167,7 +173,9 @@ public class InMemoryTaskManager implements TaskManager {
 
         List<Integer> subtasksId = epic.getSubtasksId().stream().toList();
 
-        return subtasks.values().stream().filter(subtask -> subtasksId.contains(subtask.getId())).toList();
+        return subtasks.values().stream()
+                .filter(subtask -> subtasksId.contains(subtask.getId()))
+                .toList();
     }
 
     @Override
@@ -232,7 +240,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(taskBeforeUpdate);
         }
 
-        if (!isValidDateTime(task)) {
+        if (isInvalidDateTime(task)) {
             tasks.put(task.getId(), task);
         } else if (!isOverlapping(task)) {
             tasks.put(task.getId(), task);
@@ -252,7 +260,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(subtaskBeforeUpdate);
         }
 
-        if (!isValidDateTime(subtask)) {
+        if (isInvalidDateTime(subtask)) {
             subtasks.put(subtask.getId(), subtask);
         } else if (!isOverlapping(subtask)) {
             subtasks.put(subtask.getId(), subtask);
@@ -329,9 +337,13 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        long doneCount = subtaskList.stream().filter(subtask -> subtask.getStatus() == TaskStatus.DONE).count();
+        long doneCount = subtaskList.stream()
+                .filter(subtask -> subtask.getStatus() == TaskStatus.DONE)
+                .count();
 
-        long newCount = subtaskList.stream().filter(subtask -> subtask.getStatus() == TaskStatus.NEW).count();
+        long newCount = subtaskList.stream()
+                .filter(subtask -> subtask.getStatus() == TaskStatus.NEW)
+                .count();
 
         if (doneCount == subtasksCount) {
             epic.setStatus(TaskStatus.DONE);
@@ -358,14 +370,18 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (!subtaskList.isEmpty()) {
             LocalDateTime startTime = subtaskList.stream()
-                    .min(taskComparator).get().getStartTime();
+                    .min(taskComparator)
+                    .get()
+                    .getStartTime();
 
             Duration duration = subtaskList.stream()
                     .map(Subtask::getDuration)
                     .reduce(Duration.ZERO, Duration::plus);
 
             LocalDateTime endTime = subtaskList.stream()
-                    .max(Comparator.comparing(Subtask::getEndTime)).get().getEndTime();
+                    .max(Comparator.comparing(Subtask::getEndTime))
+                    .get()
+                    .getEndTime();
 
             epic.setStartTime(startTime);
             epic.setDuration(duration);
@@ -396,7 +412,7 @@ public class InMemoryTaskManager implements TaskManager {
         return false;
     }
 
-    private static boolean isValidDateTime(Task task) {
-        return task.getStartTime() != null && task.getStartTime() != LocalDateTime.MIN;
+    private static boolean isInvalidDateTime(Task task) {
+        return task.getStartTime() == null || task.getStartTime() == LocalDateTime.MIN;
     }
 }
