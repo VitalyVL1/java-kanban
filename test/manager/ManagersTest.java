@@ -19,7 +19,7 @@ class ManagersTest {
     }
 
     @Test
-    void testgetFileBackedTaskManager_ShouldReturnFileBackedTaskManager() {
+    void testGetFileBackedTaskManager_ShouldReturnFileBackedTaskManager() {
         assertInstanceOf(TaskManager.class, Managers.getFileBackedTaskManager("test"),
                 "FileBackedTaskManager должен имплементировать TaskManager");
 

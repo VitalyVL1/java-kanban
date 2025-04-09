@@ -7,39 +7,33 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
-    private static TaskManager taskManager;
     private static File file;
-    private static Task task;
-    private static Epic epic;
-    private static Subtask subtask1;
-    private static Subtask subtask2;
 
+    @Override
+    protected TaskManager init() {
+        return Managers.getFileBackedTaskManager(file.getAbsolutePath());
+    }
 
     @BeforeAll
-    static void setUpBeforeClass() {
+    static void setUpBeforeInit() {
         try {
             file = File.createTempFile("test", ".txt");
         } catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
-
-        taskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file.getPath());
-        task = new Task("Task1", "Description Task1");
-        epic = new Epic("Epic1", "Description Epic1");
-        subtask1 = new Subtask("Subtask1", "Description Subtask1", epic);
-        subtask2 = new Subtask("Subtask2", "Description Subtask2", epic);
     }
 
     @Test
     void testSaveAndLoadTask_ShouldSaveTaskToFileAndLoadFromIt() {
-        taskManager.addTask(task);
         taskManager.addEpic(epic);
+        taskManager.addTask(task);
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
@@ -51,8 +45,8 @@ public class FileBackedTaskManagerTest {
 
         assertTrue(equalTasks(task, actualTask), "Tasks не равны");
         assertTrue(equalTasks(epic, actualEpic), "Epics не равны");
-        assertTrue(equalTasks(subtask1, actualSubtask1) && equalTasks(subtask1.getEpic(), actualSubtask1.getEpic()), "Subtask1 не равны");
-        assertTrue(equalTasks(subtask2, actualSubtask2) && equalTasks(subtask2.getEpic(), actualSubtask2.getEpic()), "Subtask2 не равны");
+        assertTrue(equalTasks(subtask1, actualSubtask1) && (Objects.equals(subtask1.getEpicId(), actualSubtask1.getEpicId())), "Subtask1 не равны");
+        assertTrue(equalTasks(subtask2, actualSubtask2) && (Objects.equals(subtask2.getEpicId(), actualSubtask2.getEpicId())), "Subtask2 не равны");
 
         List<Subtask> actualSubtasksByEpic = loadedTaskManager.getAllSubtasksByEpic(epic);
         assertTrue(actualSubtasksByEpic.containsAll(List.of(subtask1, subtask2)), "Epic не содержит нужные Subtask");
@@ -96,8 +90,8 @@ public class FileBackedTaskManagerTest {
 
         assertTrue(equalTasks(task, actualTask), "Tasks не равны");
         assertTrue(equalTasks(epic, actualEpic), "Epics не равны");
-        assertTrue(equalTasks(subtask1, actualSubtask1) && equalTasks(subtask1.getEpic(), actualSubtask1.getEpic()), "Subtask1 не равны");
-        assertTrue(equalTasks(subtask2, actualSubtask2) && equalTasks(subtask2.getEpic(), actualSubtask2.getEpic()), "Subtask2 не равны");
+        assertTrue(equalTasks(subtask1, actualSubtask1) && (Objects.equals(subtask1.getEpicId(), actualSubtask1.getEpicId())), "Subtask1 не равны");
+        assertTrue(equalTasks(subtask2, actualSubtask2) && (Objects.equals(subtask2.getEpicId(), actualSubtask2.getEpicId())), "Subtask2 не равны");
 
         taskManager.clearTasks();
         taskManager.clearSubtasks();
@@ -119,36 +113,4 @@ public class FileBackedTaskManagerTest {
         assertEquals(0, tempTaskManager.getSubtasks().size(), "Subtask должен быть пустым");
     }
 
-    private static boolean equalTasks(Task expectedTask, Task actualTask) {
-        if (expectedTask == null && actualTask == null) {
-            return true;
-        }
-
-        if ((expectedTask == null && actualTask != null) || (expectedTask != null && actualTask == null)) {
-            return false;
-        }
-
-        if (!expectedTask.getClass().equals(actualTask.getClass())) {
-            return false;
-        }
-
-        int expectedId = expectedTask.getId() == null ? -1 : expectedTask.getId();
-        String expectedTitle = expectedTask.getTitle();
-        String expectedDescription = expectedTask.getDescription();
-        TaskStatus expectedStatus = expectedTask.getStatus();
-        TaskType expectedType = expectedTask.getType();
-
-
-        int actualId = actualTask.getId() == null ? -1 : actualTask.getId();
-        String actualTitle = actualTask.getTitle();
-        String actualDescription = actualTask.getDescription();
-        TaskStatus actualStatus = actualTask.getStatus();
-        TaskType actualType = actualTask.getType();
-
-        return expectedId == actualId &&
-                expectedTitle.equals(actualTitle) &&
-                expectedDescription.equals(actualDescription) &&
-                expectedStatus.equals(actualStatus) &&
-                expectedType.equals(actualType);
-    }
 }
