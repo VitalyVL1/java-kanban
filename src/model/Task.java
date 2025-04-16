@@ -1,5 +1,7 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -8,10 +10,14 @@ public class Task {
     private String description;
     private TaskStatus status;
     private TaskType type;
+    private Duration duration;
+    private LocalDateTime startTime;
 
-    public Task(String title, String description) {
+    public Task(String title, String description, LocalDateTime startTime, Duration duration) {
         this.title = title;
         this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
         status = TaskStatus.NEW;
         type = TaskType.TASK;
     }
@@ -22,14 +28,18 @@ public class Task {
         this.description = task.getDescription();
         this.status = task.getStatus();
         this.type = task.getType();
+        this.startTime = task.getStartTime();
+        this.duration = task.getDuration();
     }
 
-    public Task(Integer id, String title, String description, TaskStatus status, TaskType type) {
+    public Task(Integer id, String title, String description, TaskStatus status, TaskType type, LocalDateTime startTime, Duration duration) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.type = type;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public Integer getId() {
@@ -81,10 +91,12 @@ public class Task {
     public String toString() {
         return "Task{" +
                 "id=" + id +
-                ", type=" + getType() +
-                ", title=" + title +
-                ", description=" + description +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
                 ", status=" + status +
+                ", type=" + type +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 
@@ -94,5 +106,25 @@ public class Task {
 
     public void setType(TaskType type) {
         this.type = type;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 }

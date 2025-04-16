@@ -1,40 +1,45 @@
 package model;
 
-public class Subtask extends Task {
-    private Epic epic;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-    public Subtask(String title, String description, Epic epic) {
-        super(title, description);
-        this.epic = epic;
+public class Subtask extends Task {
+    private Integer epicId;
+
+    public Subtask(String title, String description, Epic epic, LocalDateTime startTime, Duration duration) {
+        super(title, description, startTime, duration);
+        this.epicId = epic.getId();
         setType(TaskType.SUBTASK);
     }
 
     public Subtask(Subtask subtask) {
         super(subtask);
-        this.epic = subtask.getEpic();
+        this.epicId = subtask.getEpicId();
     }
 
-    public Subtask(Integer id, String title, String description, TaskStatus status, TaskType type, Epic epic) {
-        super(id, title, description, status, type);
-        this.epic = epic;
+    public Subtask(Integer id, String title, String description, TaskStatus status, TaskType type, Epic epic, LocalDateTime startTime, Duration duration) {
+        super(id, title, description, status, type, startTime, duration);
+        this.epicId = epic.getId();
     }
 
-    public Epic getEpic() {
-        return epic;
+    public Integer getEpicId() {
+        return epicId;
     }
 
     public void setEpic(Epic epic) {
-        this.epic = epic;
+        this.epicId = epic.getId();
     }
 
     @Override
     public String toString() {
         return "Subtask{" +
                 "id=" + getId() +
-                ", type=" + getType() +
-                ", title=" + getTitle() +
-                ", description=" + getDescription() +
+                ", title='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
+                ", type=" + getType() +
+                ", duration=" + getDuration() +
+                ", startTime=" + getStartTime() +
                 '}';
     }
 }
