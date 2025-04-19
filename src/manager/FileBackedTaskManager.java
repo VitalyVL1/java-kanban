@@ -26,7 +26,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task.getTitle(),
                 task.getStatus(),
                 task.getDescription(),
-                task.getStartTime() == LocalDateTime.MIN ? 0 :
+                task.getStartTime() == null ? 0 :
                         task.getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli(),
                 task.getDuration().toMillis()));
 
@@ -166,7 +166,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 title = split[2];
                 status = TaskStatus.valueOf(split[3]);
                 description = split[4];
-                startTime = Long.parseLong(split[5]) == 0 ? LocalDateTime.MIN :
+                startTime = Long.parseLong(split[5]) == 0 ? null :
                         LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(split[5])), ZoneOffset.UTC);
                 duration = Duration.ofMillis(Long.parseLong(split[6]));
                 epicId = !split[7].isBlank() ? Integer.parseInt(split[7]) : null;

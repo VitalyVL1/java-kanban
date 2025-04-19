@@ -387,7 +387,7 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setDuration(duration);
             epic.setEndTime(endTime);
         } else {
-            epic.setStartTime(LocalDateTime.MIN);
+            epic.setStartTime(null);
             epic.setDuration(Duration.ZERO);
             epic.setEndTime(null);
         }
@@ -413,6 +413,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private static boolean isInvalidDateTime(Task task) {
-        return task.getStartTime() == null || task.getStartTime() == LocalDateTime.MIN;
+        return task.getStartTime() == null;
     }
 }
