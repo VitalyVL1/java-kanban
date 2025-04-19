@@ -1,5 +1,6 @@
 package manager;
 
+import exception.NotFoundException;
 import exception.TaskOverlappingException;
 import model.Epic;
 import model.Subtask;
@@ -168,7 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getAllSubtasksByEpic(Epic epic) {
         if (!epics.containsKey(epic.getId())) {
-            return new ArrayList<>();
+                throw new NotFoundException("Epic с id = " + epic.getId() + " не найден!");
         }
 
         List<Integer> subtasksId = epic.getSubtasksId().stream().toList();
@@ -282,9 +283,9 @@ public class InMemoryTaskManager implements TaskManager {
             Task task = new Task(taskOptional.get());
             historyManager.add(task);
             return task;
+        } else {
+            throw new NotFoundException("Task с id = " + id + " не найден!");
         }
-
-        return null;
     }
 
     @Override
@@ -295,9 +296,9 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = new Epic(epicOptional.get());
             historyManager.add(epic);
             return epic;
+        } else {
+            throw new NotFoundException("Epic с id = " + id + " не найден!");
         }
-
-        return null;
     }
 
     @Override
@@ -308,9 +309,9 @@ public class InMemoryTaskManager implements TaskManager {
             Subtask subtask = new Subtask(subtaskOptional.get());
             historyManager.add(subtask);
             return subtask;
+        } else {
+            throw new NotFoundException("Subtask с id = " + id + " не найден!");
         }
-
-        return null;
     }
 
     @Override
