@@ -1,9 +1,6 @@
 package http_api.adapter;
 
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
-import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
