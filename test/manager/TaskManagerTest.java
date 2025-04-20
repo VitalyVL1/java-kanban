@@ -354,7 +354,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         Task presetIdTask = new Task("Title", "Description", startTime.minusHours(5), duration.plusMinutes(10));
         Epic presetIdEpic = new Epic("Title", "Description");
-        Subtask presetIdSubtask = new Subtask("Title", "Description", presetIdEpic, startTime.minusHours(7), duration.plusMinutes(5));
+        Subtask presetIdSubtask = new Subtask("Title", "Description", epic, startTime.minusHours(7), duration.plusMinutes(5));
 
         presetIdTask.setId(task.getId());
         presetIdEpic.setId(epic.getId());

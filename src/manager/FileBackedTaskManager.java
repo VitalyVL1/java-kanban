@@ -115,10 +115,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public void save() {
-        Set<Task> allTasks = new HashSet<>();
+        Set<Task> allTasks = new LinkedHashSet<>();
         allTasks.addAll(this.getTasks());
-        allTasks.addAll(this.getSubtasks());
         allTasks.addAll(this.getEpics());
+        allTasks.addAll(this.getSubtasks());
 
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(HEADER + "\n");
@@ -174,8 +174,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case TASK ->
                             taskManager.addTask(new Task(id, title, description, status, type, startTime, duration));
                     case SUBTASK -> {
-                        taskManager.addSubtask(new Subtask(id, title, description, status, type, new Epic("", ""), startTime, duration));
-                        epicIdBySubtaskId.put(id, epicId);
+                        if(epicId != null) {
+                            taskManager.addSubtask(new Subtask(id, title, description, status, type, taskManager.getEpic(epicId), startTime, duration));
+                            epicIdBySubtaskId.put(id, epicId);
+                        } // Subtask должен быть всегда привязан к Epic, проверку поставил что бы избежать NullPointerException, некорректные Subtask будут пропущены
                     }
                     case EPIC ->
                             taskManager.addEpic(new Epic(id, title, description, status, type, new HashSet<>(), startTime, duration));
@@ -185,12 +187,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (Map.Entry<Integer, Integer> entry : epicIdBySubtaskId.entrySet()) {
                 Subtask subtask = taskManager.getSubtask(entry.getKey());
                 Epic epic = taskManager.getEpic(entry.getValue());
-
-                subtask.setEpic(epic);
                 epic.addOrUpdateSubtask(subtask);
-
                 taskManager.updateEpic(epic);
-                taskManager.updateSubtask(subtask);
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка чтения из файла");

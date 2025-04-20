@@ -112,7 +112,9 @@ public class InMemoryTaskManager implements TaskManager {
 
             Integer epicId = subtask.getEpicId();
 
-            if (epicId != null) {
+            if (epicId == null || !epics.containsKey(epicId)) {
+                throw new NotFoundException("Epic c id = " + epicId + " отсутствует");
+            } else {
                 Epic epic = epics.get(epicId);
                 epic.addOrUpdateSubtask(subtask);
                 checkEpicStatus(epic);
@@ -169,7 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getAllSubtasksByEpic(Epic epic) {
         if (!epics.containsKey(epic.getId())) {
-                throw new NotFoundException("Epic с id = " + epic.getId() + " не найден!");
+            throw new NotFoundException("Epic с id = " + epic.getId() + " не найден!");
         }
 
         List<Integer> subtasksId = epic.getSubtasksId().stream().toList();
