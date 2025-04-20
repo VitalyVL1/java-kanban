@@ -82,12 +82,8 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
                     writeResponse(exchange, "Некорректный запрос", 400);
                 }
             }
-            case GET_HISTORY -> {
-                sendText(exchange, gson.toJson(taskManager.getHistory()));
-            }
-            case GET_PRIORITIZED -> {
-                sendText(exchange, gson.toJson(taskManager.getPrioritizedTasks()));
-            }
+            case GET_HISTORY -> sendText(exchange, gson.toJson(taskManager.getHistory()));
+            case GET_PRIORITIZED -> sendText(exchange, gson.toJson(taskManager.getPrioritizedTasks()));
             case POST_TASK -> {
                 if (taskId.isPresent()) {
                     try {

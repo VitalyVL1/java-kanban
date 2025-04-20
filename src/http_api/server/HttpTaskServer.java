@@ -54,7 +54,7 @@ public class HttpTaskServer {
     }
 
     //для проверки изначальное заполнение
-    private static void fillTasks (TaskManager taskManager) {
+    private static void fillTasks(TaskManager taskManager) {
         LocalDateTime startTime = LocalDateTime.now();
         Duration duration = Duration.ofMinutes(15);
 

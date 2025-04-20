@@ -174,7 +174,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case TASK ->
                             taskManager.addTask(new Task(id, title, description, status, type, startTime, duration));
                     case SUBTASK -> {
-                        if(epicId != null) {
+                        if (epicId != null) {
                             taskManager.addSubtask(new Subtask(id, title, description, status, type, taskManager.getEpic(epicId), startTime, duration));
                             epicIdBySubtaskId.put(id, epicId);
                         } // Subtask должен быть всегда привязан к Epic, проверку поставил что бы избежать NullPointerException, некорректные Subtask будут пропущены
