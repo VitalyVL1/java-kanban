@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TaskOverlappingExceptionTest {
+public class NotFoundExceptionTest {
     @Test
-    public void testTaskOverlappingException_ShouldCreateException() {
-        Exception exception = new TaskOverlappingException("Test");
+    public void testNotFoundExceptionTest_ShouldCreateException() {
+        Exception exception = new NotFoundException("Test");
 
-        assertThrows(TaskOverlappingException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             throw exception;
         }, "Не выбросился Exception");
 

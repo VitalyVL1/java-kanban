@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-abstract class TaskManagerTest<T extends TaskManager> {
+public abstract class TaskManagerTest<T extends TaskManager> {
 
     protected abstract TaskManager init();
 
@@ -690,7 +690,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(0, prioritizedListAfterUpdatingSubtask2.size(), "Subtask2 не удален из приоритизированного списка");
     }
 
-    protected static boolean equalTasks(Task expectedTask, Task actualTask) {
+    public static boolean equalTasks(Task expectedTask, Task actualTask) {
         if (expectedTask == null && actualTask == null) {
             return true;
         }
