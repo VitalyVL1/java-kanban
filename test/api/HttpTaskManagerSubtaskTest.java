@@ -1,7 +1,7 @@
-package http_api;
+package api;
 
 import exception.NotFoundException;
-import http_api.type_token.SubtaskListTypeToken;
+import api.type_token.SubtaskListTypeToken;
 import model.Epic;
 import model.Subtask;
 import org.junit.jupiter.api.Test;

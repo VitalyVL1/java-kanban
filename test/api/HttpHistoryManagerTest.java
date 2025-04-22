@@ -1,6 +1,6 @@
-package http_api;
+package api;
 
-import http_api.type_token.TaskListTypeToken;
+import api.type_token.TaskListTypeToken;
 import model.Task;
 import org.junit.jupiter.api.Test;
 

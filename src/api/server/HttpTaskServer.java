@@ -1,11 +1,11 @@
-package http_api.server;
+package api.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
-import http_api.adapter.DurationAdapter;
-import http_api.adapter.LocalDateTimeAdapter;
-import http_api.handler.*;
+import api.adapter.DurationAdapter;
+import api.adapter.LocalDateTimeAdapter;
+import api.handler.*;
 import manager.Managers;
 import manager.TaskManager;
 

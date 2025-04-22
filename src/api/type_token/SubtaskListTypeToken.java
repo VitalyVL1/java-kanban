@@ -1,4 +1,4 @@
-package http_api.type_token;
+package api.type_token;
 
 import com.google.gson.reflect.TypeToken;
 import model.Subtask;

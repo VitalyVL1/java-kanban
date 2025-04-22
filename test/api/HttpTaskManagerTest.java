@@ -1,7 +1,7 @@
-package http_api;
+package api;
 
 import com.google.gson.Gson;
-import http_api.server.HttpTaskServer;
+import api.server.HttpTaskServer;
 import manager.Managers;
 import manager.TaskManager;
 import model.Epic;
