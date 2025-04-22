@@ -5,6 +5,7 @@ import http_api.type_token.EpicListTypeToken;
 import http_api.type_token.SubtaskListTypeToken;
 import model.Epic;
 import model.Subtask;
+import model.Task;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,14 +40,14 @@ public class HttpTaskManagerEpicTest extends HttpTaskManagerTest {
 
         assertNotNull(epicsFromManager, "Эпики не возвращаются");
         assertEquals(1, epicsFromManager.size(), "Некорректное количество эпиков");
-        assertEquals("Epic1", epicsFromManager.get(0).getTitle(), "Некорректное имя эпика");
+        assertEquals("Epic1", epicsFromManager.getFirst().getTitle(), "Некорректное имя эпика");
     }
 
     @Test
     public void testUpdateEpic() throws IOException, InterruptedException {
         fillTasks(manager);
 
-        Epic updatedEpic = manager.getEpics().get(0);
+        Epic updatedEpic = manager.getEpics().getFirst();
         int actualSize = manager.getEpics().size();
         String newTitle = "Updated Title";
         String newDescription = "Updated Description";
@@ -68,10 +69,10 @@ public class HttpTaskManagerEpicTest extends HttpTaskManagerTest {
 
         assertNotNull(epicsFromManager, "Эпики не возвращаются");
         assertEquals(actualSize, epicsFromManager.size(), "Некорректное количество эпиков");
-        assertTrue(equalTasks(updatedEpic, epicsFromManager.get(0)), "Эпик не обновился");
+        assertTrue(equalTasks(updatedEpic, epicsFromManager.getFirst()), "Эпик не обновился");
 
         // проверка попытки обновить отсутствующую задачу
-        Epic notFoundEpic = manager.getEpics().get(0);
+        Epic notFoundEpic = manager.getEpics().getFirst();
         notFoundEpic.setId(0);
         taskJson = gson.toJson(notFoundEpic);
 
@@ -183,7 +184,7 @@ public class HttpTaskManagerEpicTest extends HttpTaskManagerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode(), "Некорректный код ответа");
-        assertNotNull(beforeDeleteSize, "В менеджере отсутствуют эпики");
+        assertNotEquals(0, beforeDeleteSize, "В менеджере отсутствуют эпики");
 
         final int afterDeleteSize = manager.getEpics().size();
 
@@ -191,7 +192,7 @@ public class HttpTaskManagerEpicTest extends HttpTaskManagerTest {
 
         List<Subtask> subtasks = manager.getSubtasks();
 
-        assertEquals(0, afterDeleteSize, "Подзадачи не удалены после удаления эпиков");
+        assertEquals(0, subtasks.size(), "Подзадачи не удалены после удаления эпиков");
     }
 
     @Test
@@ -199,7 +200,7 @@ public class HttpTaskManagerEpicTest extends HttpTaskManagerTest {
         fillTasks(manager);
 
         final int beforeDeleteSize = manager.getEpics().size();
-        final int epicId = manager.getEpics().get(0).getId();
+        final int epicId = manager.getEpics().getFirst().getId();
         final Set<Integer> subtasksId = manager.getEpic(epicId).getSubtasksId();
 
         HttpClient client = HttpClient.newHttpClient();
@@ -208,14 +209,14 @@ public class HttpTaskManagerEpicTest extends HttpTaskManagerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode(), "Некорректный код ответа");
-        assertNotNull(beforeDeleteSize, "В менеджере отсутствуют эпики");
+        assertNotEquals(0, beforeDeleteSize, "В менеджере отсутствуют эпики");
 
         final int afterDeleteSize = manager.getEpics().size();
 
         assertEquals(beforeDeleteSize - 1, afterDeleteSize, "Эпик не удален");
 
         List<Integer> subtasksIdManager = manager.getSubtasks().stream()
-                .map(s -> s.getId())
+                .map(Task::getId)
                 .toList();
 
         assertTrue(Collections.disjoint(subtasksIdManager, subtasksId), "Подзадачи не были удалены после удаления эпика");

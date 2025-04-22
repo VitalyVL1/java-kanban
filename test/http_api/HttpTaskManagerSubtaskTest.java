@@ -42,7 +42,7 @@ public class HttpTaskManagerSubtaskTest extends HttpTaskManagerTest {
 
         assertNotNull(subtasksFromManager, "Подзадачи не возвращаются");
         assertEquals(1, subtasksFromManager.size(), "Некорректное количество подзадач");
-        assertEquals("Subtask1", subtasksFromManager.get(0).getTitle(), "Некорректное имя подзадачи");
+        assertEquals("Subtask1", subtasksFromManager.getFirst().getTitle(), "Некорректное имя подзадачи");
 
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(406, response.statusCode(), "Возвращен некорректный код ответа для пересекающейся подзадачи");
@@ -53,7 +53,7 @@ public class HttpTaskManagerSubtaskTest extends HttpTaskManagerTest {
     public void testUpdateSubtask() throws IOException, InterruptedException {
         fillTasks(manager);
 
-        Subtask updatedSubtask = manager.getSubtasks().get(0);
+        Subtask updatedSubtask = manager.getSubtasks().getFirst();
         int actualSize = manager.getSubtasks().size();
         String newTitle = "Updated Title";
         String newDescription = "Updated Description";
@@ -79,7 +79,7 @@ public class HttpTaskManagerSubtaskTest extends HttpTaskManagerTest {
 
         assertNotNull(subtasksFromManager, "Подзадачи не возвращаются");
         assertEquals(actualSize, subtasksFromManager.size(), "Некорректное количество подзадач");
-        assertTrue(equalTasks(updatedSubtask, subtasksFromManager.get(0)), "Подзадача не обновилась");
+        assertTrue(equalTasks(updatedSubtask, subtasksFromManager.getFirst()), "Подзадача не обновилась");
 
         // проверка пересекающегося времени
         Subtask intersectionSubtask = manager.getSubtasks().get(0);
@@ -98,10 +98,10 @@ public class HttpTaskManagerSubtaskTest extends HttpTaskManagerTest {
 
         assertNotNull(subtasksFromManager, "Подзадачи не возвращаются");
         assertEquals(actualSize, subtasksFromManager.size(), "Некорректное количество подзадач");
-        assertTrue(equalTasks(updatedSubtask, subtasksFromManager.get(0)), "Подзадача не должна была обновиться");
+        assertTrue(equalTasks(updatedSubtask, subtasksFromManager.getFirst()), "Подзадача не должна была обновиться");
 
         // проверка попытки обновить отсутствующую задачу
-        Subtask notFoundSubtask = manager.getSubtasks().get(0);
+        Subtask notFoundSubtask = manager.getSubtasks().getFirst();
         notFoundSubtask.setId(0);
         taskJson = gson.toJson(notFoundSubtask);
 
@@ -194,7 +194,7 @@ public class HttpTaskManagerSubtaskTest extends HttpTaskManagerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode(), "Некорректный код ответа");
-        assertNotNull(beforeDeleteSize, "В менеджере отсутствуют подзадачи");
+        assertNotEquals(0, beforeDeleteSize, "В менеджере отсутствуют подзадачи");
 
         final int afterDeleteSize = manager.getSubtasks().size();
 
@@ -212,7 +212,7 @@ public class HttpTaskManagerSubtaskTest extends HttpTaskManagerTest {
         fillTasks(manager);
 
         final int beforeDeleteSize = manager.getSubtasks().size();
-        final int subtaskId = manager.getSubtasks().get(0).getId();
+        final int subtaskId = manager.getSubtasks().getFirst().getId();
         final int epicId = manager.getSubtask(subtaskId).getEpicId();
 
         HttpClient client = HttpClient.newHttpClient();
@@ -221,7 +221,7 @@ public class HttpTaskManagerSubtaskTest extends HttpTaskManagerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode(), "Некорректный код ответа");
-        assertNotNull(beforeDeleteSize, "В менеджере отсутствуют подзадачи");
+        assertNotEquals(0, beforeDeleteSize, "В менеджере отсутствуют подзадачи");
 
         final int afterDeleteSize = manager.getSubtasks().size();
 

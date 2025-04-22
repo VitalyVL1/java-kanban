@@ -37,7 +37,7 @@ public class HttpTaskManagerTasksTest extends HttpTaskManagerTest {
 
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
-        assertEquals("Test 2", tasksFromManager.get(0).getTitle(), "Некорректное имя задачи");
+        assertEquals("Test 2", tasksFromManager.getFirst().getTitle(), "Некорректное имя задачи");
 
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(406, response.statusCode(), "Возвращен некорректный код ответа для пересекающейся задачи");
@@ -48,7 +48,7 @@ public class HttpTaskManagerTasksTest extends HttpTaskManagerTest {
     public void testUpdateTask() throws IOException, InterruptedException {
         fillTasks(manager);
 
-        Task updatedTask = manager.getTasks().get(0);
+        Task updatedTask = manager.getTasks().getFirst();
         int actualSize = manager.getTasks().size();
         String newTitle = "Updated Title";
         String newDescription = "Updated Description";
@@ -74,7 +74,7 @@ public class HttpTaskManagerTasksTest extends HttpTaskManagerTest {
 
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(actualSize, tasksFromManager.size(), "Некорректное количество задач");
-        assertTrue(equalTasks(updatedTask, tasksFromManager.get(0)), "Задача не обновилась");
+        assertTrue(equalTasks(updatedTask, tasksFromManager.getFirst()), "Задача не обновилась");
 
         // проверка пересекающегося времени
         Task intersectionTask = manager.getTasks().get(0);
@@ -93,10 +93,10 @@ public class HttpTaskManagerTasksTest extends HttpTaskManagerTest {
 
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(actualSize, tasksFromManager.size(), "Некорректное количество задач");
-        assertTrue(equalTasks(updatedTask, tasksFromManager.get(0)), "Задача не должна была обновиться");
+        assertTrue(equalTasks(updatedTask, tasksFromManager.getFirst()), "Задача не должна была обновиться");
 
         // проверка попытки обновить отсутствующую задачу
-        Task notFoundTask = manager.getTasks().get(0);
+        Task notFoundTask = manager.getTasks().getFirst();
         notFoundTask.setId(0);
         taskJson = gson.toJson(notFoundTask);
 
@@ -188,7 +188,7 @@ public class HttpTaskManagerTasksTest extends HttpTaskManagerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode(), "Некорректный код ответа");
-        assertNotNull(beforeDeleteSize, "В менеджере отсутствуют задачи");
+        assertNotEquals(0, beforeDeleteSize, "В менеджере отсутствуют задачи");
 
         final int afterDeleteSize = manager.getTasks().size();
 
@@ -200,7 +200,7 @@ public class HttpTaskManagerTasksTest extends HttpTaskManagerTest {
         fillTasks(manager);
 
         final int beforeDeleteSize = manager.getTasks().size();
-        final int id = manager.getTasks().get(0).getId();
+        final int id = manager.getTasks().getFirst().getId();
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create(BASIC_URL + "/" + id);
@@ -208,7 +208,7 @@ public class HttpTaskManagerTasksTest extends HttpTaskManagerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode(), "Некорректный код ответа");
-        assertNotNull(beforeDeleteSize, "В менеджере отсутствуют задачи");
+        assertNotEquals(0, beforeDeleteSize, "В менеджере отсутствуют задачи");
 
         final int afterDeleteSize = manager.getTasks().size();
 

@@ -1,9 +1,5 @@
 package http_api;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import http_api.type_token.EpicListTypeToken;
-import http_api.type_token.SubtaskListTypeToken;
 import http_api.type_token.TaskListTypeToken;
 import model.Task;
 import org.junit.jupiter.api.Test;
