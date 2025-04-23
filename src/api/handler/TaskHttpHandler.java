@@ -3,6 +3,7 @@ package api.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import exception.ManagerSaveException;
 import exception.NotFoundException;
 import exception.TaskOverlappingException;
 import manager.TaskManager;
@@ -87,6 +88,8 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
                         sendHasInteractions(exchange, e.getMessage());
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getMessage());
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
                     }
                 } else {
                     try {
@@ -96,6 +99,8 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
                                 201);
                     } catch (TaskOverlappingException e) {
                         sendHasInteractions(exchange, e.getMessage());
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
                     }
                 }
             }
@@ -110,6 +115,8 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
                         sendHasInteractions(exchange, e.getMessage());
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getMessage());
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
                     }
                 } else {
                     try {
@@ -119,6 +126,8 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
                                 201);
                     } catch (TaskOverlappingException e) {
                         sendHasInteractions(exchange, e.getMessage());
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
                     }
                 }
             }
@@ -133,6 +142,8 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
                         sendHasInteractions(exchange, e.getMessage());
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getMessage());
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
                     }
                 } else {
                     try {
@@ -144,34 +155,60 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
                         sendHasInteractions(exchange, e.getMessage());
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getMessage());
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
                     }
                 }
             }
             case DELETE_TASKS -> {
                 if (taskId.isPresent()) {
-                    taskManager.removeTask(taskId.get());
-                    sendText(exchange, "Task с id = " + taskId.get() + " успешно удален");
+                    try {
+                        taskManager.removeTask(taskId.get());
+                        sendText(exchange, "Task с id = " + taskId.get() + " успешно удален");
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
+                    }
                 } else {
-                    taskManager.clearTasks();
-                    sendText(exchange, "Все Task были удалены");
+                    try {
+                        taskManager.clearTasks();
+                        sendText(exchange, "Все Task были удалены");
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
+                    }
                 }
             }
             case DELETE_EPICS -> {
                 if (taskId.isPresent()) {
-                    taskManager.removeEpic(taskId.get());
-                    sendText(exchange, "Epic с id = " + taskId.get() + " успешно удален");
+                    try {
+                        taskManager.removeEpic(taskId.get());
+                        sendText(exchange, "Epic с id = " + taskId.get() + " успешно удален");
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
+                    }
                 } else {
-                    taskManager.clearEpics();
-                    sendText(exchange, "Все Epic были удалены");
+                    try {
+                        taskManager.clearEpics();
+                        sendText(exchange, "Все Epic были удалены");
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
+                    }
                 }
             }
             case DELETE_SUBTASKS -> {
                 if (taskId.isPresent()) {
-                    taskManager.removeSubtask(taskId.get());
-                    sendText(exchange, "Subtask с id = " + taskId.get() + " успешно удален");
+                    try {
+                        taskManager.removeSubtask(taskId.get());
+                        sendText(exchange, "Subtask с id = " + taskId.get() + " успешно удален");
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
+                    }
                 } else {
-                    taskManager.clearSubtasks();
-                    sendText(exchange, "Все Subtask были удалены");
+                    try {
+                        taskManager.clearSubtasks();
+                        sendText(exchange, "Все Subtask были удалены");
+                    } catch (ManagerSaveException e) {
+                        writeResponse(exchange, e.getMessage(), 500);
+                    }
                 }
             }
             default -> writeResponse(exchange,
