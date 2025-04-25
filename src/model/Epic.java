@@ -10,7 +10,7 @@ public class Epic extends Task {
     private LocalDateTime endTime;
 
     public Epic(String title, String description) {
-        super(title, description, LocalDateTime.MIN, Duration.ZERO);
+        super(title, description, null, Duration.ZERO);
         subtasksId = new HashSet<>();
         setType(TaskType.EPIC);
     }

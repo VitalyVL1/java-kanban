@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-abstract class TaskManagerTest<T extends TaskManager> {
+public abstract class TaskManagerTest<T extends TaskManager> {
 
     protected abstract TaskManager init();
 
@@ -354,7 +354,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         Task presetIdTask = new Task("Title", "Description", startTime.minusHours(5), duration.plusMinutes(10));
         Epic presetIdEpic = new Epic("Title", "Description");
-        Subtask presetIdSubtask = new Subtask("Title", "Description", presetIdEpic, startTime.minusHours(7), duration.plusMinutes(5));
+        Subtask presetIdSubtask = new Subtask("Title", "Description", epic, startTime.minusHours(7), duration.plusMinutes(5));
 
         presetIdTask.setId(task.getId());
         presetIdEpic.setId(epic.getId());
@@ -584,7 +584,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void epicStartTimeAndDurationTest_ShouldReturnCalculatedStartTimeAndDuration() {
         taskManager.addEpic(epic);
 
-        final LocalDateTime startTimeBeforeAddSubtask = epic.getStartTime(); // LocalDateTime.MIN
+        final LocalDateTime startTimeBeforeAddSubtask = epic.getStartTime(); // null
         final LocalDateTime endTimeBeforeAddSubtask = epic.getEndTime(); // null
         final Duration durationBeforeAddSubtask = epic.getDuration(); // Duration.ZERO
 
@@ -601,7 +601,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 subtask1.getEndTime() : subtask2.getEndTime();
         final Duration correctDuration = subtask1.getDuration().plus(subtask2.getDuration());
 
-        assertEquals(LocalDateTime.MIN, startTimeBeforeAddSubtask, "Не верно установлено StartTime у нового Epic");
+        assertNull(startTimeBeforeAddSubtask, "Не верно установлено StartTime у нового Epic");
         assertNull(endTimeBeforeAddSubtask, "Не верное EndTime у нового Epic");
         assertEquals(Duration.ZERO, durationBeforeAddSubtask, "Не верно установлена Duration у нового Epic");
 
@@ -666,7 +666,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Subtask subtask1ToUpdate = taskManager.getSubtask(subtask1.getId());
         Subtask subtask2ToUpdate = taskManager.getSubtask(subtask2.getId());
 
-        subtask1ToUpdate.setStartTime(LocalDateTime.MIN);
+        subtask1ToUpdate.setStartTime(null);
         subtask1ToUpdate.setDuration(Duration.ZERO);
 
         taskManager.updateSubtask(subtask1ToUpdate);
@@ -676,21 +676,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(subtask2ToUpdate.getStartTime(), taskManager.getEpic(epic.getId()).getStartTime(), "StartTime Epic не пересчиталось");
         assertEquals(subtask2ToUpdate.getDuration(), taskManager.getEpic(epic.getId()).getDuration(), "Duration Epic не пересчиталась");
 
-        subtask2ToUpdate.setStartTime(LocalDateTime.MIN);
+        subtask2ToUpdate.setStartTime(null);
         subtask2ToUpdate.setDuration(Duration.ZERO);
 
         taskManager.updateSubtask(subtask2ToUpdate);
 
         final List<Task> prioritizedListAfterUpdatingSubtask2 = taskManager.getPrioritizedTasks();
 
-        assertEquals(LocalDateTime.MIN, taskManager.getEpic(epic.getId()).getStartTime(), "StartTime Epic не пересчиталось");
+        assertNull(taskManager.getEpic(epic.getId()).getStartTime(), "StartTime Epic не пересчиталось");
         assertEquals(Duration.ZERO, taskManager.getEpic(epic.getId()).getDuration(), "Duration Epic не пересчиталась");
 
         assertEquals(1, prioritizedListAfterUpdatingSubtask1.size(), "Subtask1 не удален из приоритизированного списка");
         assertEquals(0, prioritizedListAfterUpdatingSubtask2.size(), "Subtask2 не удален из приоритизированного списка");
     }
 
-    protected static boolean equalTasks(Task expectedTask, Task actualTask) {
+    public static boolean equalTasks(Task expectedTask, Task actualTask) {
         if (expectedTask == null && actualTask == null) {
             return true;
         }
