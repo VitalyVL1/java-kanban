@@ -14,15 +14,74 @@ import model.Task;
 import java.io.IOException;
 import java.util.Optional;
 
+/**
+ * Обработчик HTTP запросов для управления задачами.
+ *
+ * <p>Реализует REST API для работы с задачами (Task), эпиками (Epic) и подзадачами (Subtask).
+ * Поддерживает все основные CRUD операции через соответствующие HTTP методы.</p>
+ *
+ * <p>Доступные эндпоинты:</p>
+ * <ul>
+ *   <li><b>GET</b>
+ *     <ul>
+ *       <li>/tasks, /epics, /subtasks - получение всех задач/эпиков/подзадач</li>
+ *       <li>/tasks/{id}, /epics/{id}, /subtasks/{id} - получение по ID</li>
+ *       <li>/epics/{id}/subtasks - получение всех подзадач эпика</li>
+ *       <li>/history - история просмотров</li>
+ *       <li>/prioritized - задачи по приоритету</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>POST</b>
+ *     <ul>
+ *       <li>/tasks, /epics, /subtasks - создание новой задачи</li>
+ *       <li>/tasks/{id}, /epics/{id}, /subtasks/{id} - обновление существующей</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>DELETE</b>
+ *     <ul>
+ *       <li>/tasks, /epics, /subtasks - удаление всех задач</li>
+ *       <li>/tasks/{id}, /epics/{id}, /subtasks/{id} - удаление по ID</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ *
+ * <p>Коды ответов:</p>
+ * <ul>
+ *   <li>200 - успешный GET запрос</li>
+ *   <li>201 - успешное создание/обновление</li>
+ *   <li>400 - некорректный запрос</li>
+ *   <li>404 - ресурс не найден</li>
+ *   <li>406 - конфликт времени выполнения задачи</li>
+ *   <li>500 - внутренняя ошибка сервера</li>
+ *   <li>501 - метод не реализован</li>
+ * </ul>
+ *
+ * @see BaseHttpHandler
+ * @see TaskManager
+ * @see com.google.gson.Gson
+ */
 public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
+
     private final TaskManager taskManager;
     private final Gson gson;
 
+    /**
+     * Создает обработчик с заданными менеджером задач и Gson адаптером.
+     *
+     * @param taskManager менеджер для управления задачами
+     * @param gson Gson для сериализации/десериализации JSON
+     */
     public TaskHttpHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
         this.gson = gson;
     }
 
+    /**
+     * Обрабатывает HTTP запрос и направляет на соответствующий эндпоинт.
+     *
+     * @param exchange объект HTTP обмена
+     * @throws IOException если возникает ошибка ввода-вывода
+     */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Optional<Integer> taskId = getId(exchange);
@@ -217,22 +276,46 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
+    /**
+     * Перечисление доступных эндпоинтов API.
+     */
     enum Endpoint {
+        /** GET /tasks, GET /tasks/{id} */
         GET_TASKS,
+        /** GET /subtasks, GET /subtasks/{id} */
         GET_SUBTASKS,
+        /** GET /epics, GET /epics/{id} */
         GET_EPICS,
+        /** GET /epics/{id}/subtasks */
         GET_EPIC_SUBTASKS,
+        /** GET /history */
         GET_HISTORY,
+        /** GET /prioritized */
         GET_PRIORITIZED,
+        /** POST /tasks, POST /tasks/{id} */
         POST_TASK,
+        /** POST /subtasks, POST /subtasks/{id} */
         POST_SUBTASK,
+        /** POST /epics, POST /epics/{id} */
         POST_EPIC,
+        /** DELETE /tasks, DELETE /tasks/{id} */
         DELETE_TASKS,
+        /** DELETE /subtasks, DELETE /subtasks/{id} */
         DELETE_SUBTASKS,
+        /** DELETE /epics, DELETE /epics/{id} */
         DELETE_EPICS,
+        /** Неизвестный эндпоинт */
         UNKNOWN
     }
 
+    /**
+     * Извлекает ID задачи из пути запроса.
+     *
+     * <p>Ожидает формат пути: /{type}/{id} или /epics/{id}/subtasks</p>
+     *
+     * @param exchange объект HTTP обмена
+     * @return Optional с ID задачи или пустой Optional, если ID не найден
+     */
     protected Optional<Integer> getId(HttpExchange exchange) {
         String[] pathParts = exchange.getRequestURI().getPath().split("/");
         try {
@@ -242,6 +325,12 @@ public class TaskHttpHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
+    /**
+     * Определяет эндпоинт на основе метода и пути запроса.
+     *
+     * @param exchange объект HTTP обмена
+     * @return соответствующий Endpoint или UNKNOWN, если эндпоинт не найден
+     */
     protected Endpoint getEndpoint(HttpExchange exchange) {
         String requestPath = exchange.getRequestURI().getPath();
         String requestMethod = exchange.getRequestMethod();

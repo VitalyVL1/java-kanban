@@ -12,6 +12,29 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Реализация менеджера задач, хранящая все данные в оперативной памяти.
+ *
+ * <p>Обеспечивает полный функционал управления задачами, эпиками и подзадачами
+ * с проверкой временных пересечений и автоматическим обновлением статусов эпиков.
+ * Все данные хранятся в коллекциях HashMap, история просмотров делегируется
+ * {@link HistoryManager}.</p>
+ *
+ * <p>Ключевые особенности:</p>
+ * <ul>
+ *   <li><b>Проверка пересечений</b> - задачи не могут пересекаться по времени выполнения</li>
+ *   <li><b>Приоритеты</b> - задачи автоматически сортируются по времени начала</li>
+ *   <li><b>Статусы эпиков</b> - автоматически вычисляются на основе статусов подзадач</li>
+ *   <li><b>Временные параметры эпиков</b> - вычисляются как сумма/диапазон подзадач</li>
+ *   <li><b>Защитные копии</b> - при получении задач возвращаются копии для избежания внешних модификаций</li>
+ * </ul>
+ *
+ * @see TaskManager
+ * @see HistoryManager
+ * @see model.Task
+ * @see model.Epic
+ * @see model.Subtask
+ */
 public class InMemoryTaskManager implements TaskManager {
 
     private final HistoryManager historyManager;
@@ -24,11 +47,19 @@ public class InMemoryTaskManager implements TaskManager {
     private final Comparator<Task> taskComparator = Comparator.comparing(Task::getStartTime);
     private final Set<Task> prioritizedTasks = new TreeSet<>(taskComparator);
 
+    /**
+     * Создает менеджер с указанным менеджером истории.
+     *
+     * @param historyManager менеджер для управления историей просмотров
+     */
     public InMemoryTaskManager(HistoryManager historyManager) {
         taskId = 1;
         this.historyManager = historyManager;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Epic> getEpics() {
         return epics.values().stream()
@@ -36,6 +67,9 @@ public class InMemoryTaskManager implements TaskManager {
                 .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Task> getTasks() {
         return tasks.values().stream()
@@ -43,6 +77,9 @@ public class InMemoryTaskManager implements TaskManager {
                 .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Subtask> getSubtasks() {
         return subtasks.values().stream()
@@ -50,6 +87,12 @@ public class InMemoryTaskManager implements TaskManager {
                 .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Эпики не участвуют в проверке временных пересечений и не добавляются
+     * в список приоритетных задач.</p>
+     */
     @Override
     public int addEpic(Epic epic) {
         if (epic != null && !taskIds.contains(epic.getId())) {
@@ -66,6 +109,15 @@ public class InMemoryTaskManager implements TaskManager {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При добавлении задачи проверяется пересечение по времени с существующими
+     * задачами в {@link #prioritizedTasks}. Валидные задачи добавляются в
+     * отсортированный список приоритетов.</p>
+     *
+     * @throws TaskOverlappingException если задача пересекается по времени
+     */
     @Override
     public int addTask(Task task) {
         if (task != null && !taskIds.contains(task.getId())) {
@@ -91,6 +143,20 @@ public class InMemoryTaskManager implements TaskManager {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При добавлении подзадачи выполняются дополнительные действия:</p>
+     * <ul>
+     *   <li>Проверка существования эпика</li>
+     *   <li>Добавление подзадачи в эпик</li>
+     *   <li>Пересчет статуса эпика</li>
+     *   <li>Пересчет временных параметров эпика</li>
+     * </ul>
+     *
+     * @throws NotFoundException если указанный эпик не существует
+     * @throws TaskOverlappingException если подзадача пересекается по времени
+     */
     @Override
     public int addSubtask(Subtask subtask) {
         if (subtask != null && !taskIds.contains(subtask.getId())) {
@@ -126,6 +192,12 @@ public class InMemoryTaskManager implements TaskManager {
         return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При удалении эпика также удаляются все его подзадачи из всех хранилищ
+     * и из истории просмотров.</p>
+     */
     @Override
     public Epic removeEpic(int id) {
         Epic epic = epics.remove(id);
@@ -144,6 +216,9 @@ public class InMemoryTaskManager implements TaskManager {
         return epic;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Task removeTask(int id) {
         Task task = tasks.remove(id);
@@ -153,6 +228,12 @@ public class InMemoryTaskManager implements TaskManager {
         return task;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При удалении подзадачи обновляются статус и временные параметры
+     * соответствующего эпика.</p>
+     */
     @Override
     public Subtask removeSubtask(int id) {
         Subtask subtask = subtasks.remove(id);
@@ -168,6 +249,11 @@ public class InMemoryTaskManager implements TaskManager {
         return subtask;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NotFoundException если эпик с указанным id не найден
+     */
     @Override
     public List<Subtask> getAllSubtasksByEpic(Epic epic) {
         if (!epics.containsKey(epic.getId())) {
@@ -181,6 +267,11 @@ public class InMemoryTaskManager implements TaskManager {
                 .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При удалении всех эпиков также удаляются все подзадачи.</p>
+     */
     @Override
     public void clearEpics() {
         epics.values().forEach(epic -> {
@@ -198,6 +289,9 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clearTasks() {
         tasks.values().forEach(task -> {
@@ -209,6 +303,12 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При удалении всех подзадач обновляются статусы и временные параметры
+     * всех эпиков.</p>
+     */
     @Override
     public void clearSubtasks() {
         epics.values().forEach(
@@ -227,6 +327,11 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При обновлении эпика пересчитываются его статус и временные параметры.</p>
+     */
     @Override
     public void updateEpic(Epic epic) {
         checkEpicStatus(epic);
@@ -234,6 +339,14 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(epic.getId(), epic);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При обновлении задачи проверяется временное пересечение с учетом
+     * исключения самой обновляемой задачи из проверки.</p>
+     *
+     * @throws TaskOverlappingException если обновленная задача пересекается по времени
+     */
     @Override
     public void updateTask(Task task) {
         Task taskBeforeUpdate = tasks.get(task.getId());
@@ -254,6 +367,14 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>При обновлении подзадачи дополнительно обновляются статус и временные
+     * параметры соответствующего эпика.</p>
+     *
+     * @throws TaskOverlappingException если обновленная подзадача пересекается по времени
+     */
     @Override
     public void updateSubtask(Subtask subtask) {
         Subtask subtaskBeforeUpdate = subtasks.get(subtask.getId());
@@ -277,6 +398,11 @@ public class InMemoryTaskManager implements TaskManager {
         calculateTimeAndDurationOfEpic(epics.get(subtask.getEpicId()));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NotFoundException если задача не найдена
+     */
     @Override
     public Task getTask(int id) {
         Optional<Task> taskOptional = Optional.ofNullable(tasks.get(id));
@@ -290,6 +416,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NotFoundException если эпик не найден
+     */
     @Override
     public Epic getEpic(int id) {
         Optional<Epic> epicOptional = Optional.ofNullable(epics.get(id));
@@ -303,6 +434,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NotFoundException если подзадача не найдена
+     */
     @Override
     public Subtask getSubtask(int id) {
         Optional<Subtask> subtaskOptional = Optional.ofNullable(subtasks.get(id));
@@ -316,16 +452,37 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Задачи возвращаются в порядке возрастания времени начала.
+     * Задачи без времени начала (null) в этот список не попадают.</p>
+     */
     @Override
     public List<Task> getPrioritizedTasks() {
         return prioritizedTasks.stream().toList();
     }
 
+    /**
+     * Обновляет статус эпика на основе статусов его подзадач.
+     *
+     * <p>Правила вычисления статуса:</p>
+     * <ul>
+     *   <li>NEW - если все подзадачи NEW или подзадач нет</li>
+     *   <li>DONE - если все подзадачи DONE</li>
+     *   <li>IN_PROGRESS - во всех остальных случаях</li>
+     * </ul>
+     *
+     * @param epic эпик для обновления статуса
+     */
     private void checkEpicStatus(Epic epic) {
         if (epic == null) return;
 
@@ -357,6 +514,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    /**
+     * Генерирует уникальный идентификатор для новой задачи.
+     *
+     * @return уникальный идентификатор
+     */
     private int generateId() {
         while (taskIds.contains(taskId)) {
             taskId++;
@@ -365,6 +527,18 @@ public class InMemoryTaskManager implements TaskManager {
         return taskId;
     }
 
+    /**
+     * Вычисляет и устанавливает временные параметры эпика на основе его подзадач.
+     *
+     * <p>Вычисляемые параметры:</p>
+     * <ul>
+     *   <li>startTime - самое раннее время начала среди подзадач</li>
+     *   <li>duration - сумма длительности всех подзадач</li>
+     *   <li>endTime - самое позднее время окончания среди подзадач</li>
+     * </ul>
+     *
+     * @param epic эпик для вычисления временных параметров
+     */
     private void calculateTimeAndDurationOfEpic(Epic epic) {
         List<Subtask> subtaskList = prioritizedTasks.stream()
                 .filter(t -> epic.getSubtasksId().contains(t.getId()))
@@ -396,6 +570,12 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    /**
+     * Проверяет пересечение временного интервала задачи с существующими задачами.
+     *
+     * @param task задача для проверки
+     * @return true если есть пересечение, false если пересечений нет
+     */
     private boolean isOverlapping(Task task) {
         if (prioritizedTasks.isEmpty()) return false;
 
@@ -415,6 +595,12 @@ public class InMemoryTaskManager implements TaskManager {
         return false;
     }
 
+    /**
+     * Проверяет, является ли временной интервал задачи некорректным.
+     *
+     * @param task задача для проверки
+     * @return true если время начала не задано, false если задано
+     */
     private static boolean isInvalidDateTime(Task task) {
         return task.getStartTime() == null;
     }
