@@ -8,15 +8,64 @@ import java.nio.file.Files;
 import java.time.*;
 import java.util.*;
 
+/**
+ * Реализация менеджера задач с автоматическим сохранением состояния в файл.
+ *
+ * <p>Наследует функциональность {@link InMemoryTaskManager} и добавляет
+ * автоматическое сохранение всех изменений в файл. При каждом изменении
+ * данных (добавление, обновление, удаление) вызывается метод {@link #save()},
+ * который записывает актуальное состояние всех задач в файл.</p>
+ *
+ * <p>Формат файла:</p>
+ * <ul>
+ *   <li>CSV файл с заголовком: {@value #HEADER}</li>
+ *   <li>Каждая задача записывается с новой строки</li>
+ *   <li>Поля разделяются запятыми</li>
+ *   <li>Время хранится в миллисекундах (Unix timestamp)</li>
+ *   <li>Длительность хранится в миллисекундах</li>
+ * </ul>
+ *
+ * <p>Пример содержимого файла:</p>
+ * <pre>
+ * id,type,name,status,description,epic,startTime,duration
+ * 1,TASK,Задача 1,NEW,Описание задачи,,1640995200000,3600000
+ * 2,EPIC,Эпик 1,NEW,Описание эпика,,,
+ * 3,SUBTASK,Подзадача 1,NEW,Описание,,1641081600000,1800000,2
+ * </pre>
+ *
+ * <p>При создании через {@link #loadFromFile(File)} автоматически восстанавливает
+ * состояние из указанного файла, если он существует.</p>
+ *
+ * @see InMemoryTaskManager
+ * @see ManagerSaveException
+ */
 public class FileBackedTaskManager extends InMemoryTaskManager {
+
     private final File file;
+
+    /** Заголовок CSV файла с описанием колонок */
     private static final String HEADER = "id,type,name,status,description,epic,startTime,duration";
 
+    /**
+     * Создает менеджер с файловым сохранением.
+     *
+     * @param historyManager менеджер истории просмотров
+     * @param pathName путь к файлу для сохранения данных
+     */
     public FileBackedTaskManager(HistoryManager historyManager, String pathName) {
         super(historyManager);
         this.file = new File(pathName);
     }
 
+    /**
+     * Преобразует задачу в строку CSV формата.
+     *
+     * <p>Для подзадач дополнительно добавляется ID эпика в конце строки.
+     * Пустые значения времени заменяются на 0.</p>
+     *
+     * @param task задача для преобразования
+     * @return строка в CSV формате
+     */
     private static String toStringLine(Task task) {
         StringBuilder sb = new StringBuilder();
 
@@ -36,6 +85,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После добавления эпика автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public int addEpic(Epic epic) {
         int id = super.addEpic(epic);
@@ -43,6 +97,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После добавления задачи автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public int addTask(Task task) {
         int id = super.addTask(task);
@@ -50,6 +109,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После добавления подзадачи автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public int addSubtask(Subtask subtask) {
         int id = super.addSubtask(subtask);
@@ -57,6 +121,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После удаления эпика автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public Epic removeEpic(int id) {
         Epic epic = super.removeEpic(id);
@@ -64,6 +133,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return epic;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После удаления задачи автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public Task removeTask(int id) {
         Task task = super.removeTask(id);
@@ -71,6 +145,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return task;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После удаления подзадачи автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public Subtask removeSubtask(int id) {
         Subtask subtask = super.removeSubtask(id);
@@ -78,42 +157,81 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return subtask;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После очистки эпиков автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public void clearEpics() {
         super.clearEpics();
         save();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После очистки задач автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public void clearTasks() {
         super.clearTasks();
         save();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После очистки подзадач автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public void clearSubtasks() {
         super.clearSubtasks();
         save();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После обновления эпика автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public void updateEpic(Epic epic) {
         super.updateEpic(epic);
         save();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После обновления задачи автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public void updateTask(Task task) {
         super.updateTask(task);
         save();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>После обновления подзадачи автоматически сохраняет состояние в файл.</p>
+     */
     @Override
     public void updateSubtask(Subtask subtask) {
         super.updateSubtask(subtask);
         save();
     }
 
+    /**
+     * Сохраняет текущее состояние всех задач в файл.
+     *
+     * <p>Собирает все задачи (Task, Epic, Subtask) из соответствующих коллекций,
+     * объединяет их и записывает в файл в CSV формате. При возникновении ошибок
+     * ввода-вывода выбрасывает {@link ManagerSaveException}.</p>
+     *
+     * @throws ManagerSaveException если произошла ошибка при записи в файл
+     */
     public void save() {
         Set<Task> allTasks = new LinkedHashSet<>();
         allTasks.addAll(this.getTasks());
@@ -131,6 +249,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
+    /**
+     * Загружает состояние менеджера из файла.
+     *
+     * <p>Создает новый экземпляр {@link FileBackedTaskManager} и восстанавливает
+     * его состояние из указанного файла. Если файл не существует, создает пустой файл.</p>
+     *
+     * <p>Процесс загрузки:</p>
+     * <ol>
+     *   <li>Чтение всех строк из файла</li>
+     *   <li>Пропуск заголовка</li>
+     *   <li>Парсинг каждой строки в соответствующий тип задачи</li>
+     *   <li>Добавление задач в менеджер</li>
+     *   <li>Восстановление связей между эпиками и подзадачами</li>
+     * </ol>
+     *
+     * @param file файл для загрузки данных
+     * @return восстановленный менеджер задач
+     * @throws ManagerSaveException если произошла ошибка при чтении из файла
+     */
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager taskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file.getPath());
 
